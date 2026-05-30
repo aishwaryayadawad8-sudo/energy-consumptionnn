@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Alert System - SDG 7</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            background: white;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 25px;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-categories {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .alert-badge {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .badge-critical {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .badge-needs-improvement {
+            background: #ffa502;
+            color: white;
+        }
+        
+        .badge-good {
+            background: #1e90ff;
+            color: white;
+        }
+        
+        .badge-excellent {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .country-select-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .select2-container {
+            width: 100% !important;
+        }
+        
+        .select2-container--default .select2-selection--multiple {
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            min-height: 50px;
+            padding: 5px;
+        }
+        
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 3px;
+        }
+        
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 5px;
+        }
+        
+        .btn-send-selected {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-send-selected:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-send-all {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-send-all:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(168, 237, 234, 0.4);
+        }
+        
+        .selected-count {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .result-box {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .result-success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        
+        .result-error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-list li i {
+            color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style></head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+        
+        <!-- Email Alert System Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-envelope"></i> Email Alert System</h2>
+                <p class="mb-0">Send electricity access alerts to specific countries</p>
+            </div>
+            <div class="card-body">
+                <!-- How it works -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-info-circle"></i> How it works:</h5>
+                    <ul class="info-list">
+                        <li><i class="fas fa-check-circle text-success"></i> Select countries from the dropdown</li>
+                        <li><i class="fas fa-check-circle text-success"></i> System analyzes electricity access</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Sends customized alerts based on status</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Emails sent to official country addresses</li>
+                    </ul>
+                </div>
+                
+                <!-- Alert Categories -->
+                <div class="mb-4">
+                    <h5>Alert Categories:</h5>
+                    <div class="alert-categories">
+                        <span class="alert-badge badge-critical">
+                            <i class="fas fa-exclamation-triangle"></i> Critical (< 50%)
+                        </span>
+                        <span class="alert-badge badge-needs-improvement">
+                            <i class="fas fa-exclamation-circle"></i> Needs Improvement (50-75%)
+                        </span>
+                        <span class="alert-badge badge-good">
+                            <i class="fas fa-thumbs-up"></i> Good (75-95%)
+                        </span>
+                        <span class="alert-badge badge-excellent">
+                            <i class="fas fa-star"></i> Excellent (> 95%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Select Countries Card -->
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-globe"></i> Select Countries</h4>
+            </div>
+            <div class="card-body">
+                <div class="country-select-box">
+                    <label class="form-label fw-bold">Choose countries to send alerts to:</label>
+                    <select id="countrySelect" class="form-control" multiple="multiple">
+                        <!-- Countries will be loaded here -->
+                    </select>
+                    <p class="text-muted mt-2 mb-0">
+                        <i class="fas fa-info-circle"></i> You can select multiple countries. Start typing to search.
+                    </p>
+                </div>
+                
+                <!-- Selected Count -->
+                <div class="selected-count">
+                    Selected: <span id="selectedCount">0</span> countries
+                </div>
+                
+                <!-- Loading -->
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p><strong>Sending alerts to selected countries...</strong></p>
+                    <p class="text-muted">This may take a moment</p>
+                </div>
+                
+                <!-- Result -->
+                <div id="result" class="result-box"></div>
+                
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button id="sendSelectedBtn" class="btn-send-selected" disabled>
+                        <i class="fas fa-paper-plane"></i> Send Alerts to Selected Countries
+                    </button>
+                    <button id="sendAllBtn" class="btn-send-all">
+                        <i class="fas fa-globe"></i> Send to All Countries
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        let allCountries = [];
+        
+        // Load countries on page load
+        $(document).ready(function() {
+            loadCountries();
+        });
+        
+        function loadCountries() {
+            $.get('/api/objective4/countries/', function(data) {
+                if (data.success) {
+                    allCountries = data.countries.sort();
+                    
+                    // Populate select
+                    allCountries.forEach(country => {
+                        $('#countrySelect').append(
+                            $('<option></option>').val(country).text(country)
+                        );
+                    });
+                    
+                    // Initialize Select2
+                    $('#countrySelect').select2({
+                        placeholder: 'Select countries...',
+                        allowClear: true,
+                        width: '100%'
+                    });
+                    
+                    // Update count on change
+                    $('#countrySelect').on('change', function() {
+                        updateSelectedCount();
+                    });
+                }
+            });
+        }
+        
+        function updateSelectedCount() {
+            const selected = $('#countrySelect').val() || [];
+            $('#selectedCount').text(selected.length);
+            
+            // Enable/disable send button
+            if (selected.length > 0) {
+                $('#sendSelectedBtn').prop('disabled', false);
+            } else {
+                $('#sendSelectedBtn').prop('disabled', true);
+            }
+        }
+        
+        // Send to selected countries
+        $('#sendSelectedBtn').click(function() {
+            const selectedCountries = $('#countrySelect').val();
+            
+            if (!selectedCountries || selectedCountries.length === 0) {
+                alert('Please select at least one country');
+                return;
+            }
+            
+            sendAlerts(selectedCountries);
+        });
+        
+        // Send to all countries
+        $('#sendAllBtn').click(function() {
+            if (confirm(`Are you sure you want to send alerts to ALL ${allCountries.length} countries?`)) {
+                sendAlerts(null); // null means all countries
+            }
+        });
+        
+        function sendAlerts(countries) {
+            // Show loading
+            $('#loading').show();
+            $('#result').hide();
+            $('#sendSelectedBtn').prop('disabled', true);
+            $('#sendAllBtn').prop('disabled', true);
+            
+            // Send request
+            $.ajax({
+                url: '/api/send-email-alerts-selected/',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    countries: countries
+                }),
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    $('#loading').hide();
+                    $('#sendSelectedBtn').prop('disabled', false);
+                    $('#sendAllBtn').prop('disabled', false);
+                    
+                    if (response.success) {
+                        let alertsHtml = '<h5><i class="fas fa-check-circle"></i> Alerts Sent Successfully!</h5>';
+                        alertsHtml += `<p><strong>Total Alerts Sent:</strong> ${response.total_alerts}</p>`;
+                        
+                        if (response.alerts_sent && response.alerts_sent.length > 0) {
+                            alertsHtml += '<div class="mt-3"><strong>Countries:</strong><ul>';
+                            response.alerts_sent.forEach(alert => {
+                                let statusIcon = '';
+                                if (alert.status === 'critical') statusIcon = '🚨';
+                                else if (alert.status === 'needs_improvement') statusIcon = '⚠️';
+                                else if (alert.status === 'excellent') statusIcon = '🎉';
+                                else statusIcon = '✅';
+                                
+                                alertsHtml += `<li>${statusIcon} ${alert.country} - ${alert.status} (${alert.access.toFixed(1)}%)</li>`;
+                            });
+                            alertsHtml += '</ul></div>';
+                        }
+                        
+                        $('#result')
+                            .removeClass('result-error')
+                            .addClass('result-success')
+                            .html(alertsHtml)
+                            .show();
+                        
+                        // Clear selection after 3 seconds
+                        setTimeout(function() {
+                            $('#countrySelect').val(null).trigger('change');
+                            updateSelectedCount();
+                        }, 3000);
+                    } else {
+                        $('#result')
+                            .removeClass('result-success')
+                            .addClass('result-error')
+                            .html(`
+                                <h5><i class="fas fa-exclamation-circle"></i> Error</h5>
+                                <p>${response.error || 'Failed to send alerts'}</p>
+                            `)
+                            .show();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#loading').hide();
+                    $('#sendSelectedBtn').prop('disabled', false);
+                    $('#sendAllBtn').prop('disabled', false);
+                    
+                    $('#result')
+                        .removeClass('result-success')
+                        .addClass('result-error')
+                        .html(`
+                            <h5><i class="fas fa-exclamation-circle"></i> Error</h5>
+                            <p>Failed to send alerts: ${error}</p>
+                        `)
+                        .show();
+                }
+            });
+        }
+        
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

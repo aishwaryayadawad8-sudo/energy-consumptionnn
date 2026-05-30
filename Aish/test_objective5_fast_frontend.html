@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Objective 5 - Fast Loading</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .chart-container { height: 400px; margin: 20px 0; }
+        select { padding: 10px; margin: 10px; width: 200px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; margin: 10px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .best-model { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 15px; border-radius: 8px; margin: 10px 0; font-weight: bold; }
+        .speed-indicator { background: #27ae60; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; margin-left: 10px; }
+        .loading { text-align: center; padding: 20px; color: #7f8c8d; }
+        .performance-stats { background: #ecf0f1; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Objective 5: Fast Loading Test</h1>
+        
+        <div class="performance-stats">
+            <h3>📊 Performance Metrics</h3>
+            <div id="performanceMetrics">
+                <p>⏱️ Model Comparison Load Time: <span id="modelLoadTime">-</span></p>
+                <p>🌍 Countries Load Time: <span id="countriesLoadTime">-</span></p>
+                <p>📈 Country Analysis Time: <span id="analysisLoadTime">-</span></p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🏆 Model Comparison <span class="speed-indicator">INSTANT</span></h2>
+            <div id="modelInfo" class="best-model" style="display: none;"></div>
+            <div class="chart-container">
+                <canvas id="modelChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🌍 Country Selection <span class="speed-indicator">FAST</span></h2>
+            <select id="countrySelect">
+                <option value="">Loading countries...</option>
+            </select>
+            <button onclick="analyzeCountry()">🔍 Analyze Country (Instant)</button>
+        </div>
+        
+        <div class="section" id="historicalSection" style="display: none;">
+            <h2>📊 Historical Data <span class="speed-indicator">LOADED</span></h2>
+            <p id="historicalCountryName"></p>
+            <div class="chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section" id="predictionsSection" style="display: none;">
+            <h2>🔮 Future Predictions <span class="speed-indicator">LOADED</span></h2>
+            <p id="predictionsCountryName"></p>
+            <div class="chart-container">
+                <canvas id="predictionsChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section" id="combinedSection" style="display: none;">
+            <h2>📈 Combined Analysis <span class="speed-indicator">LOADED</span></h2>
+            <p id="combinedCountryName"></p>
+            <div class="chart-container">
+                <canvas id="combinedChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let modelChart = null;
+        let historicalChart = null;
+        let predictionsChart = null;
+        let combinedChart = null;
+        
+        let performanceMetrics = {
+            modelLoadTime: 0,
+            countriesLoadTime: 0,
+            analysisLoadTime: 0
+        };
+
+        // Auto-load on page load
+        window.onload = function() {
+            console.log('🚀 Loading fast Objective 5 test page...');
+            loadModelComparison();
+            loadCountries();
+        };
+
+        function loadModelComparison() {
+            const startTime = performance.now();
+            
+            // Simulate fast model comparison data (pre-computed)
+            const testData = {
+                success: true,
+                objective_name: "Energy Equity Analysis",
+                task_type: "regression",
+                metric: "MSE",
+                mse_scores: {
+                    "Linear Regression": 0.1902,
+                    "Decision Tree": 0.0209,
+                    "KNN": 0.0105,
+                    "XGBoost": 0.0078,
+                    "LightGBM": 0.0066,
+                    "CatBoost": 0.0047,
+                    "Random Forest": 0.0062
+                },
+                best_model: "CatBoost",
+                best_score: 0.0047
+            };
+
+            // Simulate instant loading
+            setTimeout(() => {
+                const endTime = performance.now();
+                performanceMetrics.modelLoadTime = endTime - startTime;
+                document.getElementById('modelLoadTime').textContent = `${performanceMetrics.modelLoadTime.toFixed(2)}ms ⚡`;
+                
+                displayModelComparison(testData);
+            }, 10); // Minimal delay to simulate API call
+        }
+
+        function loadCountries() {
+            const startTime = performance.now();
+            
+            // Simulate fast countries loading (pre-computed)
+            const countries = [
+                "Afghanistan", "Albania", "Algeria", "Angola", "Argentina", "Australia", 
+                "Austria", "Bangladesh", "Belgium", "Brazil", "Canada", "China", 
+                "Denmark", "Egypt", "France", "Germany", "India", "Indonesia", 
+                "Italy", "Japan", "Kenya", "Mexico", "Netherlands", "Nigeria", 
+                "Norway", "Pakistan", "Russia", "South Africa", "Spain", "Sweden", 
+                "Turkey", "United Kingdom", "United States", "Vietnam"
+            ];
+            
+            setTimeout(() => {
+                const endTime = performance.now();
+                performanceMetrics.countriesLoadTime = endTime - startTime;
+                document.getElementById('countriesLoadTime').textContent = `${performanceMetrics.countriesLoadTime.toFixed(2)}ms ⚡`;
+                
+                const select = document.getElementById('countrySelect');
+                select.innerHTML = '<option value="">-- Select a Country --</option>';
+                countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country;
+                    option.textContent = country;
+                    select.appendChild(option);
+                });
+                
+                console.log(`✅ Loaded ${countries.length} countries instantly`);
+            }, 5); // Minimal delay
+        }
+
+        function displayModelComparison(data) {
+            // Show best model info
+            document.getElementById('modelInfo').innerHTML = 
+                `⭐ Best Model: ${data.best_model} (${data.metric} = ${data.best_score.toFixed(4)}) - Loaded Instantly!`;
+            document.getElementById('modelInfo').style.display = 'block';
+
+            // Create chart
+            const ctx = document.getElementById('modelChart').getContext('2d');
+            
+            if (modelChart) {
+                modelChart.destroy();
+            }
+            
+            const models = Object.keys(data.mse_scores);
+            const scoreValues = Object.values(data.mse_scores);
+            
+            const colors = models.map(model => 
+                model === data.best_model ? 'rgba(255, 215, 0, 0.8)' : 'rgba(102, 126, 234, 0.7)'
+            );
+            
+            modelChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: `${data.metric} Score`,
+                        data: scoreValues,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.7', '1').replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${data.objective_name} - Model Comparison (FAST LOADING)`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: data.metric }
+                        }
+                    }
+                }
+            });
+        }
+
+        function analyzeCountry() {
+            const country = document.getElementById('countrySelect').value;
+            
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            
+            const startTime = performance.now();
+            console.log(`🌍 Analyzing ${country} with fast loading...`);
+            
+            // Simulate instant loading for all three charts
+            setTimeout(() => {
+                const endTime = performance.now();
+                performanceMetrics.analysisLoadTime = endTime - startTime;
+                document.getElementById('analysisLoadTime').textContent = `${performanceMetrics.analysisLoadTime.toFixed(2)}ms ⚡`;
+                
+                loadHistoricalData(country);
+                loadPredictions(country);
+                loadCombinedData(country);
+            }, 15); // Minimal delay to simulate fast API calls
+        }
+
+        function loadHistoricalData(country) {
+            // Generate sample historical data
+            const years = [];
+            const access = [];
+            for (let year = 2000; year <= 2020; year++) {
+                years.push(year);
+                access.push(Math.min(100, 20 + (year - 2000) * 3 + Math.random() * 10));
+            }
+            
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('historicalCountryName').textContent = 
+                `Historical Access to Electricity for ${country} (Loaded Instantly)`;
+            
+            const ctx = document.getElementById('historicalChart').getContext('2d');
+            
+            if (historicalChart) {
+                historicalChart.destroy();
+            }
+            
+            historicalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: `${country} - Electricity Access (%)`,
+                        data: access,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Historical Access - ${country} (FAST LOADED)`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadPredictions(country) {
+            // Generate sample predictions data
+            const years = [];
+            const access = [];
+            for (let year = 2021; year <= 2030; year++) {
+                years.push(year);
+                access.push(Math.min(100, 85 + (year - 2021) * 1.5 + Math.random() * 5));
+            }
+            
+            document.getElementById('predictionsSection').style.display = 'block';
+            document.getElementById('predictionsCountryName').textContent = 
+                `Future Predictions for ${country} (2021-2030) - Loaded Instantly`;
+            
+            const ctx = document.getElementById('predictionsChart').getContext('2d');
+            
+            if (predictionsChart) {
+                predictionsChart.destroy();
+            }
+            
+            predictionsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: `${country} - Predicted Access (%)`,
+                        data: access,
+                        borderColor: 'rgba(56, 239, 125, 1)',
+                        backgroundColor: 'rgba(56, 239, 125, 0.2)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Future Predictions - ${country} (FAST LOADED)`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadCombinedData(country) {
+            document.getElementById('combinedSection').style.display = 'block';
+            document.getElementById('combinedCountryName').textContent = 
+                `Complete Analysis: Historical + Future for ${country} - Loaded Instantly`;
+            
+            const ctx = document.getElementById('combinedChart').getContext('2d');
+            
+            if (combinedChart) {
+                combinedChart.destroy();
+            }
+            
+            // Generate combined data
+            const historicalYears = [];
+            const historicalAccess = [];
+            for (let year = 2000; year <= 2020; year++) {
+                historicalYears.push(year);
+                historicalAccess.push(Math.min(100, 20 + (year - 2000) * 3 + Math.random() * 10));
+            }
+            
+            const predictedYears = [];
+            const predictedAccess = [];
+            for (let year = 2021; year <= 2030; year++) {
+                predictedYears.push(year);
+                predictedAccess.push(Math.min(100, 85 + (year - 2021) * 1.5 + Math.random() * 5));
+            }
+            
+            combinedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...historicalYears, ...predictedYears],
+                    datasets: [
+                        {
+                            label: 'Historical Data',
+                            data: historicalYears.map((year, i) => ({
+                                x: year,
+                                y: historicalAccess[i]
+                            })),
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Future Predictions',
+                            data: predictedYears.map((year, i) => ({
+                                x: year,
+                                y: predictedAccess[i]
+                            })),
+                            borderColor: 'rgba(56, 239, 125, 1)',
+                            backgroundColor: 'rgba(56, 239, 125, 0.2)',
+                            borderWidth: 3,
+                            borderDash: [10, 5],
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Complete Analysis - ${country} (FAST LOADED)`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

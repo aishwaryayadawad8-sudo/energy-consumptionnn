@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Real Country Boundaries</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #map { height: 400px; width: 100%; border: 2px solid #ccc; margin: 20px 0; }
+        .test-button { 
+            background: #3498db; color: white; padding: 10px 20px; 
+            border: none; border-radius: 5px; margin: 5px; cursor: pointer; 
+        }
+        .test-button:hover { background: #2980b9; }
+        .log { 
+            background: #f8f9fa; padding: 15px; border-radius: 5px; 
+            margin: 10px 0; max-height: 200px; overflow-y: auto; 
+            font-family: monospace; font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Real Country Boundaries Test</h1>
+    
+    <div>
+        <button class="test-button" onclick="testCountry('India')">Test India</button>
+        <button class="test-button" onclick="testCountry('Germany')">Test Germany</button>
+        <button class="test-button" onclick="testCountry('Brazil')">Test Brazil</button>
+        <button class="test-button" onclick="testCountry('Japan')">Test Japan</button>
+        <button class="test-button" onclick="clearMap()">Clear Map</button>
+    </div>
+    
+    <div id="map"></div>
+    
+    <div class="log" id="log">
+        <strong>Test Log:</strong><br>
+        Click a country button to test real boundary loading...
+    </div>
+
+    <script>
+        let map;
+        let currentLayer;
+        
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            log('Map initialized');
+        }
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += '<br>' + new Date().toLocaleTimeString() + ': ' + message;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearMap() {
+            if (currentLayer) {
+                map.removeLayer(currentLayer);
+                currentLayer = null;
+            }
+            map.setView([20, 0], 2);
+            log('Map cleared');
+        }
+        
+        function testCountry(countryName) {
+            log(`Testing ${countryName}...`);
+            clearMap();
+            
+            // GeoJSON sources to test
+            const sources = [
+                'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson',
+                'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson'
+            ];
+            
+            loadCountryFromSources(countryName, sources, 0);
+        }
+        
+        function loadCountryFromSources(countryName, sources, index) {
+            if (index >= sources.length) {
+                log(`❌ All sources failed for ${countryName}`);
+                return;
+            }
+            
+            const source = sources[index];
+            log(`📡 Trying source ${index + 1}/${sources.length}...`);
+            
+            fetch(source)
+                .then(response => response.json())
+                .then(data => {
+                    log(`✅ Loaded GeoJSON data (${data.features.length} features)`);
+                    
+                    // Find the country
+                    const feature = findCountryFeature(data, countryName);
+                    
+                    if (feature) {
+                        log(`✅ Found ${countryName}!`);
+                        highlightCountry(feature, countryName);
+                    } else {
+                        log(`❌ ${countryName} not found, trying next source...`);
+                        loadCountryFromSources(countryName, sources, index + 1);
+                    }
+                })
+                .catch(error => {
+                    log(`❌ Source ${index + 1} failed: ${error.message}`);
+                    loadCountryFromSources(countryName, sources, index + 1);
+                });
+        }
+        
+        function findCountryFeature(geoJsonData, countryName) {
+            const searchTerms = [
+                countryName.toLowerCase(),
+                countryName.replace(/\s+/g, '').toLowerCase()
+            ];
+            
+            for (const feature of geoJsonData.features) {
+                const props = feature.properties;
+                if (!props) continue;
+                
+                const propertyNames = ['NAME', 'name', 'NAME_EN', 'ADMIN', 'admin'];
+                
+                for (const propName of propertyNames) {
+                    if (props[propName]) {
+                        const propValue = props[propName].toLowerCase();
+                        
+                        for (const term of searchTerms) {
+                            if (propValue === term || propValue.includes(term)) {
+                                log(`✅ Match found: ${propName} = "${props[propName]}"`);
+                                return feature;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return null;
+        }
+        
+        function highlightCountry(feature, countryName) {
+            // Create country layer with green highlighting
+            currentLayer = L.geoJSON(feature, {
+                style: {
+                    fillColor: '#dcfce7',
+                    weight: 3,
+                    opacity: 1,
+                    color: '#22c55e',
+                    fillOpacity: 0.6
+                }
+            }).addTo(map);
+            
+            // Zoom to country
+            const bounds = currentLayer.getBounds();
+            map.fitBounds(bounds, { padding: [20, 20] });
+            
+            log(`✅ ${countryName} highlighted with real boundaries!`);
+        }
+        
+        // Initialize when page loads
+        window.onload = initMap;
+    </script>
+</body>
+</html>

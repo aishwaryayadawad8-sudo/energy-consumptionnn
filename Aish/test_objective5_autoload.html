@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Objective 5 Auto-Load</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .loading { text-align: center; padding: 20px; color: #7f8c8d; }
+        .spinner-border { 
+            width: 3rem; height: 3rem; border: 0.25em solid currentColor;
+            border-right-color: transparent; border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+        .best-model-badge { 
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white; padding: 12px 20px; border-radius: 25px; 
+            font-weight: bold; display: inline-block; margin: 15px 0;
+        }
+        #chartContainer { height: 400px; margin: 20px 0; }
+        .section-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Test Objective 5: Auto-Load Model Comparison</h1>
+        
+        <div class="section-card">
+            <h2>📊 Model Comparison (Auto-Loading)</h2>
+            <p id="statusText">Loading model comparison automatically...</p>
+            
+            <div id="modelComparisonLoading" class="loading" style="display: block;">
+                <div class="spinner-border" role="status"></div>
+                <p>Auto-loading model comparison...</p>
+            </div>
+            
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div id="chartContainer">
+                <canvas id="testChart"></canvas>
+            </div>
+            
+            <button onclick="loadModelComparison()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; margin-top: 10px;">
+                🔄 Reload Model Comparison
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let testChart = null;
+
+        // Auto-load on page load
+        window.onload = function() {
+            console.log('Page loaded, auto-loading model comparison...');
+            
+            // Auto-load after 1 second delay
+            setTimeout(() => {
+                console.log('Starting auto-load...');
+                loadModelComparison();
+            }, 1000);
+        };
+
+        function loadModelComparison() {
+            console.log('Loading model comparison...');
+            document.getElementById('modelComparisonLoading').style.display = 'block';
+            document.getElementById('statusText').textContent = 'Loading model comparison...';
+            
+            // Simulate API call with setTimeout
+            setTimeout(() => {
+                const testData = {
+                    success: true,
+                    objective_name: "Energy Equity Analysis",
+                    task_type: "regression",
+                    metric: "MSE",
+                    mse_scores: {
+                        "Linear Regression": 0.1902,
+                        "Decision Tree": 0.0209,
+                        "KNN": 0.0105,
+                        "XGBoost": 0.0078,
+                        "LightGBM": 0.0066,
+                        "CatBoost": 0.0047,
+                        "Random Forest": 0.0062
+                    },
+                    best_model: "CatBoost",
+                    best_score: 0.0047
+                };
+
+                displayResults(testData);
+            }, 2000); // Simulate 2 second loading time
+        }
+
+        function displayResults(data) {
+            console.log('Displaying results:', data);
+            document.getElementById('modelComparisonLoading').style.display = 'none';
+            document.getElementById('statusText').textContent = `${data.task_type === 'classification' ? 'Higher is Better' : 'Lower is Better'} - ${data.objective_name}`;
+            
+            // Show best model
+            document.getElementById('bestModelInfo').innerHTML = 
+                `<div class="best-model-badge">
+                    ⭐ Best Model: ${data.best_model} (${data.metric} = ${data.best_score.toFixed(4)})
+                </div>`;
+            document.getElementById('bestModelInfo').style.display = 'block';
+
+            // Create chart
+            const ctx = document.getElementById('testChart').getContext('2d');
+            
+            if (testChart) {
+                testChart.destroy();
+            }
+            
+            const models = Object.keys(data.mse_scores);
+            const scoreValues = Object.values(data.mse_scores);
+            
+            // Create colors array - highlight best model in gold
+            const colors = models.map(model => 
+                model === data.best_model ? 'rgba(255, 215, 0, 0.8)' : 'rgba(102, 126, 234, 0.7)'
+            );
+            const borderColors = models.map(model => 
+                model === data.best_model ? 'rgba(255, 215, 0, 1)' : 'rgba(102, 126, 234, 1)'
+            );
+            
+            testChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: `${data.metric} Score`,
+                        data: scoreValues,
+                        backgroundColor: colors,
+                        borderColor: borderColors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `${data.objective_name} - ${data.metric} Comparison (Auto-Loaded)`,
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y.toFixed(4);
+                                    const isBest = context.label === data.best_model;
+                                    return `${context.label}: ${value}${isBest ? ' ⭐ (Best)' : ''}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: data.metric
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Machine Learning Models'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('✅ Model comparison loaded successfully!');
+        }
+    </script>
+</body>
+</html>

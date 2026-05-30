@@ -1,0 +1,560 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 1: Energy Consumption Prediction</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        .country-select {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .country-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-load {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        
+        .btn-load:hover {
+            opacity: 0.9;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style></head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/country-forecasts/?t=1766296981'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-chart-line"></i> Objective 1: Energy Consumption Prediction</h1>
+            <p class="text-muted">Predict future energy consumption patterns using machine learning</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> Model Comparison (MSE Scores)</h2>
+            <p class="text-muted">Instant model comparison - Lower MSE = Better Model Performance</p>
+            <div id="modelComparisonLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Training models and comparing performance...</p>
+            </div>
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div class="chart-container">
+                <canvas id="mseChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Country Selection -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-globe"></i> Select Country for Analysis</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select">
+                        <option value="">Loading countries...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-load w-100" onclick="loadCountryData()">
+                        <i class="fas fa-search"></i> Analyze Country
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-history"></i> Historical Energy Consumption</h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div class="chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Future Predictions Section -->
+        <div class="section-card" id="predictionsSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-crystal-ball"></i> Future Predictions (2021-2030)</h2>
+            <p class="text-muted" id="predictionsCountryName"></p>
+            <div class="chart-container">
+                <canvas id="predictionsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let mseChart = null;
+        let historicalChart = null;
+        let predictionsChart = null;
+        let historicalDataStore = null; // Store historical data for predictions chart
+        
+        // Load countries and model comparison on page load
+        window.onload = function() {
+            loadCountries();
+            loadModelComparison();
+        };
+        
+        function loadCountries() {
+            fetch('/api/objective1/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+        function loadModelComparison() {
+            // Hide loading immediately since we have instant results
+            // Loading complete - chart appears instantly
+            
+            fetch('/api/objective1/model-comparison/')
+                .then(response => response.json())
+                .then(data => {
+                    
+                    if (data.success) {
+                        // Create chart
+                        const ctx = document.getElementById('mseChart').getContext('2d');
+                        
+                        if (mseChart) {
+                            mseChart.destroy();
+                        }
+                        
+                        // Define model order and colors
+                        const modelOrder = ['Linear Regression', 'Decision Tree', 'KNN', 'XGBoost', 'LightGBM', 'CatBoost', 'Random Forest'];
+                        const models = [];
+                        const mseValues = [];
+                        const backgroundColors = [];
+                        const borderColors = [];
+                        
+                        modelOrder.forEach(model => {
+                            if (data.mse_scores[model] !== undefined) {
+                                models.push(model);
+                                mseValues.push(data.mse_scores[model]);
+                                
+                                // Highlight XGBoost in yellow/gold
+                                if (model === 'XGBoost') {
+                                    backgroundColors.push('rgba(255, 193, 7, 0.8)');
+                                    borderColors.push('rgba(255, 193, 7, 1)');
+                                } else {
+                                    backgroundColors.push('rgba(102, 126, 234, 0.7)');
+                                    borderColors.push('rgba(102, 126, 234, 1)');
+                                }
+                            }
+                        });
+                        
+                        mseChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: models,
+                                datasets: [{
+                                    label: 'MSE',
+                                    data: mseValues,
+                                    backgroundColor: backgroundColors,
+                                    borderColor: borderColors,
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Predict Energy Consumption (MSE)',
+                                        font: {
+                                            size: 18,
+                                            weight: 'bold'
+                                        },
+                                        padding: {
+                                            top: 10,
+                                            bottom: 20
+                                        },
+                                        align: 'start'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return 'MSE: ' + context.parsed.y.toFixed(4);
+                                            }
+                                        }
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'top',
+                                        anchor: 'end',
+                                        formatter: function(value) {
+                                            return value.toFixed(4);
+                                        },
+                                        font: {
+                                            size: 11,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'MSE',
+                                            font: {
+                                                size: 14,
+                                                weight: 'bold'
+                                            }
+                                        },
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)'
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            font: {
+                                                size: 11
+                                            }
+                                        }
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 30
+                                    }
+                                }
+                            },
+                            plugins: [{
+                                afterDatasetsDraw: function(chart) {
+                                    const ctx = chart.ctx;
+                                    chart.data.datasets.forEach(function(dataset, i) {
+                                        const meta = chart.getDatasetMeta(i);
+                                        if (!meta.hidden) {
+                                            meta.data.forEach(function(element, index) {
+                                                ctx.fillStyle = 'rgb(0, 0, 0)';
+                                                const fontSize = 11;
+                                                const fontStyle = 'bold';
+                                                const fontFamily = 'Arial';
+                                                ctx.font = fontStyle + ' ' + fontSize + 'px ' + fontFamily;
+                                                
+                                                const dataString = dataset.data[index].toFixed(4);
+                                                ctx.textAlign = 'center';
+                                                ctx.textBaseline = 'bottom';
+                                                
+                                                const padding = 5;
+                                                const position = element.tooltipPosition();
+                                                ctx.fillText(dataString, position.x, position.y - padding);
+                                            });
+                                        }
+                                    });
+                                }
+                            }]
+                        });
+                    }
+                })
+                .catch(error => {
+                    // Loading complete - chart appears instantly
+                    console.error('Error:', error);
+                    alert('Error loading model comparison');
+                });
+        }
+        
+        function loadCountryData() {
+            const country = document.getElementById('countrySelect').value;
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            
+            // Show sections immediately
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('predictionsSection').style.display = 'block';
+            
+            // Update titles immediately
+            document.getElementById('historicalCountryName').textContent = 
+                `Historical energy consumption for ${country}`;
+            document.getElementById('predictionsCountryName').textContent = 
+                `Historical & Predicted energy consumption for ${country}`;
+            
+            // Show instant sample charts while loading real data
+            showInstantSampleCharts(country);
+            
+            // Load real data in background
+            loadRealCountryData(country);
+        }
+        
+        function showInstantSampleCharts(country) {
+            // Create instant historical chart with sample data
+            const ctx1 = document.getElementById('historicalChart').getContext('2d');
+            
+            if (historicalChart) {
+                historicalChart.destroy();
+            }
+            
+            // Sample historical data (will be replaced with real data)
+            const sampleYears = [2015, 2016, 2017, 2018, 2019, 2020];
+            const sampleConsumption = [3500, 3600, 3750, 3800, 3900, 3850];
+            
+            historicalChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: sampleYears,
+                    datasets: [{
+                        label: 'Energy Consumption (kWh/person)',
+                        data: sampleConsumption,
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: {
+                            display: true,
+                            text: 'Loading real data...',
+                            color: '#666'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'kWh per person' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Year' }
+                        }
+                    }
+                }
+            });
+            
+            // Create instant predictions chart
+            const ctx2 = document.getElementById('predictionsChart').getContext('2d');
+            
+            if (predictionsChart) {
+                predictionsChart.destroy();
+            }
+            
+            // Sample combined data
+            const allYears = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+            const historicalData = [3500, 3600, 3750, 3800, 3900, 3850, null, null, null, null, null];
+            const predictionData = [null, null, null, null, null, null, 3900, 4000, 4100, 4200, 4300];
+            
+            predictionsChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: allYears,
+                    datasets: [
+                        {
+                            label: 'Historical Consumption (kWh/person)',
+                            data: historicalData,
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Predicted Consumption (kWh/person)',
+                            data: predictionData,
+                            borderColor: 'rgba(39, 174, 96, 1)',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: {
+                            display: true,
+                            text: 'Loading real data...',
+                            color: '#666'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'kWh per person' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Year' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function loadRealCountryData(country) {
+            // Load historical data
+            fetch(`/api/objective1/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(historicalData => {
+                    if (historicalData.success && historicalData.data && historicalData.data.length > 0) {
+                        // Update historical chart with real data
+                        const years = historicalData.data.map(d => d.Year);
+                        const consumption = historicalData.data.map(d => d['Primary energy consumption per capita (kWh/person)']);
+                        
+                        // Store for predictions chart
+                        historicalDataStore = { years: years, consumption: consumption };
+                        
+                        // Update historical chart
+                        if (historicalChart) {
+                            historicalChart.data.labels = years;
+                            historicalChart.data.datasets[0].data = consumption;
+                            historicalChart.options.plugins.title.text = `Historical Data for ${country}`;
+                            historicalChart.update();
+                        }
+                        
+                        // Load predictions
+                        return fetch(`/api/objective1/predictions/?country=${encodeURIComponent(country)}&years=10`);
+                    } else {
+                        throw new Error('No historical data available');
+                    }
+                })
+                .then(response => response.json())
+                .then(predictionsData => {
+                    if (predictionsData.success && predictionsData.predictions && predictionsData.predictions.length > 0) {
+                        // Update predictions chart with real data
+                        const historicalYears = historicalDataStore.years;
+                        const historicalData = historicalDataStore.consumption;
+                        const predictionYears = predictionsData.predictions.map(d => d.year);
+                        const predictionData = predictionsData.predictions.map(d => d.predicted_consumption);
+                        
+                        const allYears = [...historicalYears, ...predictionYears];
+                        const historicalFull = [...historicalData, ...Array(predictionYears.length).fill(null)];
+                        const predictionFull = [...Array(historicalYears.length).fill(null), ...predictionData];
+                        
+                        if (predictionsChart) {
+                            predictionsChart.data.labels = allYears;
+                            predictionsChart.data.datasets[0].data = historicalFull;
+                            predictionsChart.data.datasets[1].data = predictionFull;
+                            predictionsChart.options.plugins.title.text = `Real Data for ${country}`;
+                            predictionsChart.update();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    // Update chart titles to show error
+                    if (historicalChart) {
+                        historicalChart.options.plugins.title.text = 'Error loading data. Please try again.';
+                        historicalChart.update();
+                    }
+                    if (predictionsChart) {
+                        predictionsChart.options.plugins.title.text = 'Error loading data. Please try again.';
+                        predictionsChart.update();
+                    }
+                });
+        }
+        
+        </script>
+</body>
+</html>
+

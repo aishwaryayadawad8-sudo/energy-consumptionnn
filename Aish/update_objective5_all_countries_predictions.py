@@ -1,0 +1,559 @@
+#!/usr/bin/env python3
+"""
+Update Objective 5 to show future predictions for ALL countries
+(like the screenshot shows)
+"""
+
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 5: Energy Equity Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .dashboard-container { max-width: 1600px; margin: 0 auto; }
+        .header-section { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 30px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        }
+        .back-btn { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            margin-bottom: 15px; 
+        }
+        .back-btn:hover { opacity: 0.9; }
+        .section-card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        }
+        .section-title { 
+            color: #2c3e50; 
+            font-weight: bold; 
+            margin-bottom: 20px; 
+            font-size: 1.5rem; 
+        }
+        .chart-container { 
+            position: relative; 
+            height: 500px; 
+            margin-top: 20px; 
+        }
+        .best-model-badge { 
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%); 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            display: inline-block; 
+            margin-top: 10px; 
+        }
+        .task-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .task-regression {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+        .code-section {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .country-select { 
+            border-radius: 50px; 
+            padding: 12px 20px; 
+            border: 2px solid #e0e0e0; 
+        }
+        .btn-load { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            padding: 12px 30px; 
+            border-radius: 50px; 
+            font-weight: bold; 
+        }
+        .btn-load:hover { opacity: 0.9; }
+        
+        /* Zigzag Layout Styles */
+        .zigzag-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 30px;
+        }
+        .zigzag-left {
+            flex-direction: row;
+        }
+        .zigzag-right {
+            flex-direction: row-reverse;
+        }
+        .zigzag-content {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .zigzag-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            min-width: 100px;
+            text-align: center;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .zigzag-row {
+                flex-direction: column !important;
+            }
+            .zigzag-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-balance-scale"></i> Sub-objective 5: Energy Equity Analysis</h1>
+            <p class="text-muted">ML model comparison for energy equity analysis using regression models</p>
+            <span class="task-badge task-regression">REGRESSION</span>
+        </div>
+
+        <!-- Code Display Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-code"></i> Implementation Code</h2>
+            <button class="btn btn-sm btn-secondary" onclick="toggleCode()">
+                <i class="fas fa-code"></i> Toggle Code View
+            </button>
+            <div class="code-section" id="codeSection" style="display: none;">
+<pre># === Objective 5: Energy Equity Analysis ===
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from xgboost import XGBRegressor
+
+# Load and clean data
+df = pd.read_csv('global-data-on-sustainable-energy.csv')
+
+# Train multiple models
+models = {
+    "Linear Regression": LinearRegression(),
+    "Decision Tree": DecisionTreeRegressor(),
+    "KNN": KNeighborsRegressor(),
+    "XGBoost": XGBRegressor()
+}
+
+# Compare MSE scores
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    mse = mean_squared_error(y_test, y_pred)
+    print(f"{name} MSE: {mse:.4f}")
+
+# Predict future access for all countries (2024-2030)
+future_years = np.arange(2024, 2031)
+predictions = model.predict(future_data)</pre>
+            </div>
+        </div>
+
+        <!-- Zigzag Layout for Charts -->
+        <div id="chartsContainer">
+            <!-- Chart 1: Model Comparison (Left) -->
+            <div class="zigzag-row zigzag-left">
+                <div class="zigzag-number">1</div>
+                <div class="zigzag-content">
+                    <h2 class="section-title"><i class="fas fa-trophy"></i> Model Comparison (MSE)</h2>
+                    <p class="text-muted">Lower MSE = Better Model Performance</p>
+                    <div class="best-model-badge">
+                        <i class="fas fa-star"></i> Best Model: XGBoost (MSE = 0.0131)
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="mseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Historical Data (Right) -->
+            <div class="zigzag-row zigzag-right">
+                <div class="zigzag-number">2</div>
+                <div class="zigzag-content">
+                    <h2 class="section-title"><i class="fas fa-history"></i> Historical Access to Electricity</h2>
+                    <p class="text-muted">Historical data by country (% population)</p>
+                    <div id="historicalLoading" class="loading-spinner" style="display: none;">
+                        <div class="spinner-border" role="status"></div>
+                        <p>Loading historical data...</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="historicalChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 3: Future Predictions for ALL Countries (Left) -->
+            <div class="zigzag-row zigzag-left">
+                <div class="zigzag-number">3</div>
+                <div class="zigzag-content">
+                    <h2 class="section-title"><i class="fas fa-crystal-ball"></i> Forecasted Access to Electricity</h2>
+                    <p class="text-muted">Forecasted Access to Electricity (% population) by Country (SDG7) 2024-2030</p>
+                    <div id="predictionsLoading" class="loading-spinner">
+                        <div class="spinner-border" role="status"></div>
+                        <p>Loading predictions for all countries...</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="predictionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let mseChart = null;
+        let historicalChart = null;
+        let predictionsChart = null;
+
+        window.onload = function() {
+            loadModelComparison();
+            loadHistoricalDataAllCountries();
+            loadPredictionsAllCountries();
+        };
+
+        function toggleCode() {
+            const codeSection = document.getElementById('codeSection');
+            codeSection.style.display = codeSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function loadModelComparison() {
+            const scores = {
+                "Linear Regression": 0.1853,
+                "Decision Tree": 0.0352,
+                "KNN": 0.0168,
+                "XGBoost": 0.0131
+            };
+
+            const ctx = document.getElementById('mseChart').getContext('2d');
+            const labels = Object.keys(scores);
+            const data = Object.values(scores);
+            
+            const colors = labels.map(label => 
+                label === "XGBoost" ? 'rgba(255, 215, 0, 0.8)' : 'rgba(99, 110, 250, 0.7)'
+            );
+            const borderColors = labels.map(label => 
+                label === "XGBoost" ? 'rgba(255, 215, 0, 1)' : 'rgba(99, 110, 250, 1)'
+            );
+
+            mseChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'MSE',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: borderColors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Model Comparison (MSE)',
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'MSE',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadHistoricalDataAllCountries() {
+            document.getElementById('historicalLoading').style.display = 'block';
+            
+            fetch('/api/objective5/historical/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    
+                    if (data.success && data.data.length > 0) {
+                        renderHistoricalChartAllCountries(data.data);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    console.error('Error loading historical data:', error);
+                });
+        }
+
+        function renderHistoricalChartAllCountries(data) {
+            // Group data by country
+            const countryData = {};
+            data.forEach(item => {
+                if (!countryData[item.Entity]) {
+                    countryData[item.Entity] = [];
+                }
+                countryData[item.Entity].push({
+                    year: item.Year,
+                    access: item['Access to electricity (% of population)']
+                });
+            });
+
+            // Get all unique years
+            const years = [...new Set(data.map(d => d.Year))].sort();
+            
+            // Create datasets for each country
+            const datasets = Object.keys(countryData).map((country, index) => {
+                const hue = (index * 360 / Object.keys(countryData).length) % 360;
+                return {
+                    label: country,
+                    data: years.map(year => {
+                        const point = countryData[country].find(d => d.year === year);
+                        return point ? point.access : null;
+                    }),
+                    borderColor: `hsl(${hue}, 70%, 50%)`,
+                    backgroundColor: `hsla(${hue}, 70%, 50%, 0.1)`,
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    hidden: true // Hide by default
+                };
+            });
+
+            // Show first 5 countries by default
+            datasets.slice(0, 5).forEach(ds => ds.hidden = false);
+
+            const ctx = document.getElementById('historicalChart').getContext('2d');
+            if (historicalChart) historicalChart.destroy();
+            
+            historicalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                font: { size: 10 },
+                                padding: 5,
+                                boxWidth: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Historical Access to Electricity (% population) by Country',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Year' }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        function loadPredictionsAllCountries() {
+            document.getElementById('predictionsLoading').style.display = 'block';
+            
+            // First get all countries
+            fetch('/api/objective5/countries/')
+                .then(response => response.json())
+                .then(countriesData => {
+                    if (countriesData.success) {
+                        const countries = countriesData.countries;
+                        const datasets = [];
+                        let completed = 0;
+                        
+                        // Load predictions for each country
+                        countries.forEach((country, index) => {
+                            fetch(`/api/objective5/predictions/?country=${encodeURIComponent(country)}&years=7`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success && data.predictions.length > 0) {
+                                        const hue = (index * 360 / countries.length) % 360;
+                                        datasets.push({
+                                            label: country,
+                                            data: data.predictions.map(d => d.predicted_access),
+                                            borderColor: `hsl(${hue}, 70%, 50%)`,
+                                            backgroundColor: `hsla(${hue}, 70%, 50%, 0.1)`,
+                                            borderWidth: 2,
+                                            fill: false,
+                                            tension: 0.4,
+                                            pointRadius: 0,
+                                            pointHoverRadius: 4,
+                                            hidden: true // Hide by default
+                                        });
+                                    }
+                                    completed++;
+                                    
+                                    // When all countries loaded, render chart
+                                    if (completed === countries.length) {
+                                        document.getElementById('predictionsLoading').style.display = 'none';
+                                        renderPredictionsChartAllCountries(datasets);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error(`Error loading predictions for ${country}:`, error);
+                                    completed++;
+                                    if (completed === countries.length) {
+                                        document.getElementById('predictionsLoading').style.display = 'none';
+                                        renderPredictionsChartAllCountries(datasets);
+                                    }
+                                });
+                        });
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('predictionsLoading').style.display = 'none';
+                    console.error('Error loading countries:', error);
+                });
+        }
+
+        function renderPredictionsChartAllCountries(datasets) {
+            // Show first 10 countries by default
+            datasets.slice(0, 10).forEach(ds => ds.hidden = false);
+
+            const ctx = document.getElementById('predictionsChart').getContext('2d');
+            if (predictionsChart) predictionsChart.destroy();
+            
+            predictionsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [2024, 2025, 2026, 2027, 2028, 2029, 2030],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                font: { size: 10 },
+                                padding: 5,
+                                boxWidth: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Forecasted Access to Electricity (% population) by Country (SDG7) 2024-2030',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 85,
+                            max: 95,
+                            title: {
+                                display: true,
+                                text: 'Access to electricity (% of population)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+"""
+
+# Write the file
+output_path = 'sustainable_energy/dashboard/templates/dashboard/objective5.html'
+with open(output_path, 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print(f"✅ Updated {output_path}")
+print("✅ Objective 5 now shows:")
+print("   📊 Chart 1: Model Comparison (4 models)")
+print("   📈 Chart 2: Historical Data for ALL countries")
+print("   🔮 Chart 3: Future Predictions for ALL countries (2024-2030)")
+print("\n✨ Features:")
+print("   - Auto-loads predictions for all 127 countries")
+print("   - Shows first 10 countries by default")
+print("   - Click legend to show/hide specific countries")
+print("   - Zigzag layout (1-LEFT, 2-RIGHT, 3-LEFT)")
+print("   - Loading spinners while data loads")
+print("\n🚀 Restart your Django server and visit /objective5/")

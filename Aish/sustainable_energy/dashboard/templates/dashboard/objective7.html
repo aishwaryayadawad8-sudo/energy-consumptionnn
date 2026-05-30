@@ -1,0 +1,480 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 7: Renewable Energy Potential Assessment</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 600px;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .btn-load {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        
+        .btn-load:hover {
+            opacity: 0.9;
+        }
+        
+        .country-select {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .country-select:focus {
+            border-color: #e67e22;
+            box-shadow: 0 0 0 0.2rem rgba(230, 126, 34, 0.25);
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style></head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/country-forecasts/?t=1766296981'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-solar-panel"></i> Objective 7: Renewable Energy Potential Assessment</h1>
+            <p class="text-muted">Assess renewable energy growth trends and predict future potential for clean energy adoption across countries</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> Model Comparison - Mean Squared Error</h2>
+            <p class="text-muted">Regression task - Auto-loading renewable energy potential model comparison...</p>
+            <div id="modelComparisonLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p>Model comparison loading...</p>
+            </div>
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div id="mseChart" class="chart-container"></div>
+        </div>
+        
+        <!-- Country Selection -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-globe"></i> Select Country for Analysis</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select">
+                        <option value="">Loading countries...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-load w-100" onclick="loadCountryData()">
+                        <i class="fas fa-search"></i> Analyze Country
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-history"></i> Historical Renewable Capacity</h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div id="historicalLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p>Loading historical data...</p>
+            </div>
+            <div id="historicalChart" class="chart-container"></div>
+        </div>
+        
+        <!-- Combined Historical + Future Section -->
+        <div class="section-card" id="combinedSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Renewable Energy Investment Potential (Historical + Future)</h2>
+            <p class="text-muted" id="combinedCountryName"></p>
+            <div id="combinedLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p>Loading combined data...</p>
+            </div>
+            <div id="combinedChart" class="chart-container"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.onload = function() {
+            console.log('Page loaded, initializing Objective 7...');
+            
+            // Load countries dropdown
+            loadCountries();
+            
+            // Auto-load model comparison immediately
+            console.log('Auto-loading model comparison...');
+            loadModelComparison();
+        };
+        
+        function loadCountries() {
+            fetch('/api/objective7/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+        function loadCountryData() {
+            const country = document.getElementById('countrySelect').value;
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            loadHistoricalData(country);
+            loadCombinedData(country);
+        }
+        
+        function loadModelComparison() {
+            // Loading instantly - no spinner needed
+            fetch('/api/objective7/model-comparison/')
+                .then(response => response.json())
+                .then(data => {
+                    // Loading complete - chart appears instantly
+                    
+                    if (data.success) {
+                        const models = Object.keys(data.mse_scores);
+                        const mseValues = Object.values(data.mse_scores);
+                        
+                        // Debug: Log the models to console
+                        console.log('Models:', models);
+                        console.log('MSE Values:', mseValues);
+                        
+                        // Create colors array - highlight best model in gold
+                        const colors = models.map(model => 
+                            model === data.best_model ? '#FFD700' : '#636EFA'
+                        );
+                        
+                        const trace = {
+                            x: models,
+                            y: mseValues,
+                            type: 'bar',
+                            marker: {
+                                color: colors,
+                                line: {
+                                    color: models.map(model => 
+                                        model === data.best_model ? '#FFA500' : '#636EFA'
+                                    ),
+                                    width: 2
+                                }
+                            },
+                            text: mseValues.map(v => v.toFixed(4)),
+                            textposition: 'outside',
+                            textfont: { 
+                                size: 12,
+                                color: 'black'
+                            },
+                            showlegend: false
+                        };
+                        
+                        const layout = {
+                            title: {
+                                text: 'Renewable Energy Potential',
+                                font: { 
+                                    size: 18,
+                                    color: '#2c3e50',
+                                    family: 'Arial, sans-serif'
+                                },
+                                x: 0.5,
+                                xanchor: 'center'
+                            },
+                            xaxis: { 
+                                title: {
+                                    text: 'Models',
+                                    font: { size: 14 }
+                                },
+                                tickfont: { size: 11 },
+                                tickangle: -45,
+                                automargin: true,
+                                tickmode: 'array',
+                                tickvals: models,
+                                ticktext: models,
+                                type: 'category'
+                            },
+                            yaxis: { 
+                                title: {
+                                    text: 'MSE',
+                                    font: { size: 14 }
+                                },
+                                tickfont: { size: 12 },
+                                tickformat: '.4f'
+                            },
+                            height: 600,
+                            showlegend: false,
+                            plot_bgcolor: 'rgba(248, 249, 250, 0.8)',
+                            paper_bgcolor: 'white',
+                            margin: {
+                                l: 80,
+                                r: 150,
+                                t: 100,
+                                b: 150
+                            }
+                        };
+                        
+                        Plotly.newPlot('mseChart', [trace], layout, {responsive: true});
+                    }
+                })
+                .catch(error => {
+                    // Loading complete - chart appears instantly
+                    console.error('Error:', error);
+                });
+        }
+        
+        function loadHistoricalData(country) {
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('historicalCountryName').textContent = `Renewable energy potential trends for ${country}`;
+            document.getElementById('historicalLoading').style.display = 'block';
+            document.getElementById('historicalChart').innerHTML = '';
+            
+            fetch(`/api/objective7/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    
+                    if (data.success && data.data.length > 0) {
+                        const years = data.data.map(d => d.Year);
+                        const scores = data.data.map(d => d.Investment_Score);
+                        
+                        const trace = {
+                            x: years,
+                            y: scores,
+                            type: 'scatter',
+                            mode: 'lines+markers',
+                            name: country,
+                            line: { width: 3, color: 'rgba(230, 126, 34, 0.8)' },
+                            marker: { size: 8, color: 'rgba(211, 84, 0, 0.8)' }
+                        };
+                        
+                        const layout = {
+                            title: `Historical Investment Score - ${country}`,
+                            xaxis: { 
+                                title: 'Year',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)'
+                            },
+                            yaxis: { 
+                                title: 'Investment Score',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)'
+                            },
+                            height: 600,
+                            plot_bgcolor: 'rgba(240, 245, 250, 0.5)',
+                            paper_bgcolor: 'white'
+                        };
+                        
+                        Plotly.newPlot('historicalChart', [trace], layout, {responsive: true});
+                    } else {
+                        document.getElementById('historicalChart').innerHTML = '<p class="text-center text-muted">No historical data available for this country</p>';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    console.error('Error:', error);
+                    document.getElementById('historicalChart').innerHTML = '<p class="text-center text-danger">Error loading data</p>';
+                });
+        }
+        
+        function loadCombinedData(country) {
+            document.getElementById('combinedSection').style.display = 'block';
+            document.getElementById('combinedCountryName').textContent = `Combined historical and predicted renewable energy potential for ${country}`;
+            document.getElementById('combinedLoading').style.display = 'block';
+            document.getElementById('combinedChart').innerHTML = '';
+            
+            fetch(`/api/objective7/combined/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('combinedLoading').style.display = 'none';
+                    
+                    if (data.success && data.data.length > 0) {
+                        const historical = { years: [], levels: [] };
+                        const predicted = { years: [], levels: [] };
+                        
+                        const levelMap = {
+                            'Low Potential': 1,
+                            'Medium Potential': 2,
+                            'High Potential': 3
+                        };
+                        
+                        data.data.forEach(d => {
+                            const level = levelMap[d.investment_category] || 1;
+                            
+                            if (d.type === 'historical') {
+                                historical.years.push(d.year);
+                                historical.levels.push(level);
+                            } else {
+                                predicted.years.push(d.year);
+                                predicted.levels.push(level);
+                            }
+                        });
+                        
+                        const traces = [];
+                        
+                        if (historical.years.length > 0) {
+                            traces.push({
+                                x: historical.years,
+                                y: historical.levels,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                name: 'Historical',
+                                line: { width: 3, color: 'rgba(230, 126, 34, 0.8)' },
+                                marker: { size: 8 },
+                                hovertemplate: `<b>${country}</b><br>Year: %{x}<br>Level: %{text}<extra></extra>`,
+                                text: historical.levels.map(l => 
+                                    l === 1 ? 'Low Potential' : l === 2 ? 'Medium Potential' : 'High Potential'
+                                )
+                            });
+                        }
+                        
+                        if (predicted.years.length > 0) {
+                            traces.push({
+                                x: predicted.years,
+                                y: predicted.levels,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                name: 'Predicted',
+                                line: { width: 3, dash: 'dot', color: 'rgba(211, 84, 0, 0.8)' },
+                                marker: { size: 8 },
+                                hovertemplate: `<b>${country}</b><br>Year: %{x}<br>Level: %{text}<extra></extra>`,
+                                text: predicted.levels.map(l => 
+                                    l === 1 ? 'Low Potential' : l === 2 ? 'Medium Potential' : 'High Potential'
+                                )
+                            });
+                        }
+                        
+                        const layout = {
+                            title: `Investment Strategy - ${country} (Historical + Future)`,
+                            xaxis: { 
+                                title: 'Year',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)'
+                            },
+                            yaxis: { 
+                                title: 'Investment Potential',
+                                tickmode: 'array',
+                                tickvals: [1, 2, 3],
+                                ticktext: ['Low Potential', 'Medium Potential', 'High Potential'],
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)',
+                                range: [0.5, 3.5]
+                            },
+                            height: 600,
+                            showlegend: true,
+                            legend: { x: 0.02, y: 0.98 },
+                            plot_bgcolor: 'rgba(240, 245, 250, 0.5)',
+                            paper_bgcolor: 'white',
+                            shapes: [
+                                {
+                                    type: 'line',
+                                    x0: 2020,
+                                    x1: 2020,
+                                    y0: 0.5,
+                                    y1: 3.5,
+                                    line: {
+                                        color: 'rgba(0,0,0,0.3)',
+                                        width: 2,
+                                        dash: 'dash'
+                                    }
+                                }
+                            ]
+                        };
+                        
+                        Plotly.newPlot('combinedChart', traces, layout, {responsive: true});
+                    } else {
+                        document.getElementById('combinedChart').innerHTML = '<p class="text-center text-muted">No data available for this country</p>';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('combinedLoading').style.display = 'none';
+                    console.error('Error:', error);
+                    document.getElementById('combinedChart').innerHTML = '<p class="text-center text-danger">Error loading data</p>';
+                });
+        }
+    </script>
+</body>
+</html>
+

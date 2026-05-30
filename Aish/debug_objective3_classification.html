@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Objective 3 Classification Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .chart-container { width: 100%; height: 400px; margin: 20px 0; }
+        .info { background: #e8f4fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .debug { background: #f8f9fa; padding: 10px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug: Objective 3 Classification Chart</h1>
+        
+        <div class="info">
+            <h3>Data Summary for Belarus:</h3>
+            <ul>
+                <li><strong>Total Points:</strong> 31</li>
+                <li><strong>Historical:</strong> 21 points</li>
+                <li><strong>Predicted:</strong> 10 points</li>
+            </ul>
+        </div>
+        
+        <button onclick="createChart()">Create Chart</button>
+        <button onclick="testAPI()">Test API</button>
+        
+        <div class="chart-container">
+            <canvas id="debugChart"></canvas>
+        </div>
+        
+        <div class="debug" id="debugLog">Ready to test...</div>
+    </div>
+
+    <script>
+        let chart = null;
+        
+        function log(message) {
+            console.log(message);
+            document.getElementById('debugLog').innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+        }
+        
+        function createChart() {
+            log('🎨 Creating chart with sample data...');
+            
+            const canvas = document.getElementById('debugChart');
+            const ctx = canvas.getContext('2d');
+            
+            if (chart) chart.destroy();
+            
+            // Map access levels to numbers
+            const levelMap = {
+                'Low Access': 1,
+                'Medium Access': 2,
+                'High Access': 3
+            };
+            
+            // Prepare historical data
+            const historicalData = [{"x": 2000, "y": 3}, {"x": 2001, "y": 3}, {"x": 2002, "y": 3}, {"x": 2003, "y": 3}, {"x": 2004, "y": 3}, {"x": 2005, "y": 3}, {"x": 2006, "y": 3}, {"x": 2007, "y": 3}, {"x": 2008, "y": 3}, {"x": 2009, "y": 3}, {"x": 2010, "y": 3}, {"x": 2011, "y": 3}, {"x": 2012, "y": 3}, {"x": 2013, "y": 3}, {"x": 2014, "y": 3}, {"x": 2015, "y": 3}, {"x": 2016, "y": 3}, {"x": 2017, "y": 3}, {"x": 2018, "y": 3}, {"x": 2019, "y": 3}, {"x": 2020, "y": 3}];
+            
+            // Prepare predicted data  
+            const predictedData = [{"x": 2021, "y": 3}, {"x": 2022, "y": 3}, {"x": 2023, "y": 3}, {"x": 2024, "y": 3}, {"x": 2025, "y": 3}, {"x": 2026, "y": 3}, {"x": 2027, "y": 3}, {"x": 2028, "y": 3}, {"x": 2029, "y": 3}, {"x": 2030, "y": 3}];
+            
+            log('📊 Historical data points: ' + historicalData.length);
+            log('📊 Predicted data points: ' + predictedData.length);
+            
+            const datasets = [];
+            
+            // Add historical dataset
+            if (historicalData.length > 0) {
+                datasets.push({
+                    label: 'Historical',
+                    data: historicalData,
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 3,
+                    stepped: true,
+                    fill: false,
+                    pointRadius: 4
+                });
+            }
+            
+            // Add predicted dataset
+            if (predictedData.length > 0) {
+                datasets.push({
+                    label: 'Future Predictions',
+                    data: predictedData,
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    borderWidth: 3,
+                    borderDash: [10, 5],
+                    stepped: true,
+                    fill: false,
+                    pointRadius: 4
+                });
+            }
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Energy Access Classification - Belarus',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: true }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 2000,
+                            max: 2030,
+                            title: { display: true, text: 'Year' },
+                            ticks: { stepSize: 5 }
+                        },
+                        y: {
+                            min: 0.5,
+                            max: 3.5,
+                            title: { display: true, text: 'Access Level' },
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    const labels = {1: 'Low Access', 2: 'Medium Access', 3: 'High Access'};
+                                    return labels[value] || '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            log('✅ Chart created successfully!');
+        }
+        
+        function testAPI() {
+            log('🌐 Testing API...');
+            
+            fetch('/api/objective3/combined/?country=Belarus')
+                .then(response => {
+                    log('📡 API Response: ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    log('📋 API Data: ' + JSON.stringify(data, null, 2));
+                    
+                    if (data.success && data.data) {
+                        log('✅ API works! Data points: ' + data.data.length);
+                    } else {
+                        log('❌ API failed: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    log('❌ API Error: ' + error.message);
+                });
+        }
+        
+        // Auto-create chart on load
+        window.onload = function() {
+            createChart();
+        };
+    </script>
+</body>
+</html>

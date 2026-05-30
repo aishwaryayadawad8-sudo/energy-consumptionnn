@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Objective 5 Country Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .chart-container { height: 400px; margin: 20px 0; }
+        select { padding: 10px; margin: 10px; width: 200px; }
+        button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; margin: 10px; }
+        .best-model { background: #f39c12; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Objective 5: Country Analysis</h1>
+        
+        <div class="section">
+            <h2>🏆 Model Comparison</h2>
+            <div id="modelInfo" class="best-model" style="display: none;"></div>
+            <div class="chart-container">
+                <canvas id="modelChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🌍 Country Selection</h2>
+            <select id="countrySelect">
+                <option value="">Loading countries...</option>
+            </select>
+            <button onclick="analyzeCountry()">🔍 Analyze Country</button>
+        </div>
+        
+        <div class="section" id="historicalSection" style="display: none;">
+            <h2>📊 Historical Data</h2>
+            <p id="historicalCountryName"></p>
+            <div class="chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section" id="predictionsSection" style="display: none;">
+            <h2>🔮 Future Predictions</h2>
+            <p id="predictionsCountryName"></p>
+            <div class="chart-container">
+                <canvas id="predictionsChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section" id="combinedSection" style="display: none;">
+            <h2>📈 Combined Analysis</h2>
+            <p id="combinedCountryName"></p>
+            <div class="chart-container">
+                <canvas id="combinedChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let modelChart = null;
+        let historicalChart = null;
+        let predictionsChart = null;
+        let combinedChart = null;
+
+        // Auto-load on page load
+        window.onload = function() {
+            console.log('🚀 Loading Objective 5 test page...');
+            loadModelComparison();
+            loadCountries();
+        };
+
+        function loadModelComparison() {
+            // Simulate model comparison data
+            const testData = {
+                success: true,
+                objective_name: "Energy Equity Analysis",
+                task_type: "regression",
+                metric: "MSE",
+                mse_scores: {
+                    "Linear Regression": 0.1853,
+                    "Decision Tree": 0.0352,
+                    "K-Nearest Neighbors": 0.0168,
+                    "XGBoost": 0.0131
+                },
+                best_model: "XGBoost",
+                best_score: 0.0131
+            };
+
+            displayModelComparison(testData);
+        }
+
+        function displayModelComparison(data) {
+            // Show best model info
+            document.getElementById('modelInfo').innerHTML = 
+                `⭐ Best Model: ${data.best_model} (${data.metric} = ${data.best_score.toFixed(4)})`;
+            document.getElementById('modelInfo').style.display = 'block';
+
+            // Create chart
+            const ctx = document.getElementById('modelChart').getContext('2d');
+            
+            if (modelChart) {
+                modelChart.destroy();
+            }
+            
+            const models = Object.keys(data.mse_scores);
+            const scoreValues = Object.values(data.mse_scores);
+            
+            const colors = models.map(model => 
+                model === data.best_model ? 'rgba(255, 215, 0, 0.8)' : 'rgba(102, 126, 234, 0.7)'
+            );
+            
+            modelChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: `${data.metric} Score`,
+                        data: scoreValues,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.7', '1').replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${data.objective_name} - Model Comparison`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: data.metric }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadCountries() {
+            // Simulate countries data
+            const countries = ['Afghanistan', 'Albania', 'Algeria', 'Angola', 'Argentina', 'Australia', 'Austria', 'Bangladesh', 'Belgium', 'Brazil'];
+            
+            const select = document.getElementById('countrySelect');
+            select.innerHTML = '<option value="">-- Select a Country --</option>';
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                select.appendChild(option);
+            });
+            
+            console.log(`✅ Loaded ${countries.length} countries`);
+        }
+
+        function analyzeCountry() {
+            const country = document.getElementById('countrySelect').value;
+            
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            
+            console.log(`🌍 Analyzing ${country}...`);
+            
+            // Simulate data loading
+            loadHistoricalData(country);
+            loadPredictions(country);
+            loadCombinedData(country);
+        }
+
+        function loadHistoricalData(country) {
+            // Simulate historical data
+            const years = [2000, 2005, 2010, 2015, 2020];
+            const access = [20, 35, 50, 70, 85];
+            
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('historicalCountryName').textContent = 
+                `Historical Access to Electricity for ${country}`;
+            
+            const ctx = document.getElementById('historicalChart').getContext('2d');
+            
+            if (historicalChart) {
+                historicalChart.destroy();
+            }
+            
+            historicalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: `${country} - Electricity Access (%)`,
+                        data: access,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Historical Access - ${country}`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadPredictions(country) {
+            // Simulate predictions data
+            const years = [2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
+            const access = [87, 88, 89, 90, 91, 92, 93, 94, 95, 96];
+            
+            document.getElementById('predictionsSection').style.display = 'block';
+            document.getElementById('predictionsCountryName').textContent = 
+                `Future Predictions for ${country} (2021-2030)`;
+            
+            const ctx = document.getElementById('predictionsChart').getContext('2d');
+            
+            if (predictionsChart) {
+                predictionsChart.destroy();
+            }
+            
+            predictionsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: `${country} - Predicted Access (%)`,
+                        data: access,
+                        borderColor: 'rgba(56, 239, 125, 1)',
+                        backgroundColor: 'rgba(56, 239, 125, 0.2)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Future Predictions - ${country}`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadCombinedData(country) {
+            // Simulate combined data
+            const historicalYears = [2000, 2005, 2010, 2015, 2020];
+            const historicalAccess = [20, 35, 50, 70, 85];
+            const predictedYears = [2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
+            const predictedAccess = [87, 88, 89, 90, 91, 92, 93, 94, 95, 96];
+            
+            document.getElementById('combinedSection').style.display = 'block';
+            document.getElementById('combinedCountryName').textContent = 
+                `Complete Analysis: Historical + Future for ${country}`;
+            
+            const ctx = document.getElementById('combinedChart').getContext('2d');
+            
+            if (combinedChart) {
+                combinedChart.destroy();
+            }
+            
+            const allYears = [...historicalYears, ...predictedYears];
+            
+            combinedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allYears,
+                    datasets: [
+                        {
+                            label: 'Historical Data',
+                            data: historicalYears.map((year, i) => ({
+                                x: year,
+                                y: historicalAccess[i]
+                            })),
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Future Predictions',
+                            data: predictedYears.map((year, i) => ({
+                                x: year,
+                                y: predictedAccess[i]
+                            })),
+                            borderColor: 'rgba(56, 239, 125, 1)',
+                            backgroundColor: 'rgba(56, 239, 125, 0.2)',
+                            borderWidth: 3,
+                            borderDash: [10, 5],
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Complete Analysis - ${country}`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Access (%)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

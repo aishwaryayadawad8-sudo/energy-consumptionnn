@@ -1,0 +1,439 @@
+{
+	"info": {
+		"_postman_id": "sdg7-dashboard-apis",
+		"name": "SDG 7 Dashboard - Complete API Collection",
+		"description": "Complete API collection for testing SDG 7 Sustainable Energy Dashboard\n\nMake sure your Django server is running at http://127.0.0.1:8000/",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🌍 Main Dashboard APIs",
+			"item": [
+				{
+					"name": "Search Country - India",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/search/?country=India",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "search", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "India",
+									"description": "Country name to search"
+								}
+							]
+						},
+						"description": "Get complete energy profile for India including electricity access, renewable share, CO2 emissions, and historical data"
+					}
+				},
+				{
+					"name": "Search Country - Kenya",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/search/?country=Kenya",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "search", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Kenya"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Countries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/countries/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "countries", ""]
+						},
+						"description": "Get list of all 176 countries in the database"
+					}
+				},
+				{
+					"name": "Predict Future - Kenya (5 years)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/predict/?country=Kenya&years=5",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "predict", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Kenya"
+								},
+								{
+									"key": "years",
+									"value": "5",
+									"description": "Number of years to predict (1-10)"
+								}
+							]
+						},
+						"description": "Get ML-based predictions for Kenya's electricity access for next 5 years"
+					}
+				},
+				{
+					"name": "Get Map Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/map-data/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "map-data", ""]
+						},
+						"description": "Get data for world map visualization with lat/lon coordinates"
+					}
+				}
+			],
+			"description": "Main dashboard APIs for country search, predictions, and map data"
+		},
+		{
+			"name": "⚡ Objective 1: Energy Consumption",
+			"item": [
+				{
+					"name": "Model Comparison",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective1/model-comparison/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective1", "model-comparison", ""]
+						},
+						"description": "Compare MSE scores of CatBoost, Random Forest, and XGBoost models"
+					}
+				},
+				{
+					"name": "Historical Data - Germany",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective1/historical-data/?country=Germany",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective1", "historical-data", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Germany"
+								}
+							]
+						},
+						"description": "Get historical energy consumption data for Germany (2000-2020)"
+					}
+				},
+				{
+					"name": "Future Predictions - USA (10 years)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective1/future-predictions/?country=United States&years=10",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective1", "future-predictions", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "United States"
+								},
+								{
+									"key": "years",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Predict energy consumption for USA for next 10 years"
+					}
+				},
+				{
+					"name": "Get Countries List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective1/countries/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective1", "countries", ""]
+						}
+					}
+				}
+			],
+			"description": "Objective 1: Forecast Energy Consumption using ML models"
+		},
+		{
+			"name": "💨 Objective 2: CO₂ Emissions",
+			"item": [
+				{
+					"name": "Model Comparison",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective2/model-comparison/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective2", "model-comparison", ""]
+						}
+					}
+				},
+				{
+					"name": "Historical Data - China",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective2/historical-data/?country=China",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective2", "historical-data", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "China"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Future Predictions - Brazil (5 years)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective2/future-predictions/?country=Brazil&years=5",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective2", "future-predictions", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Brazil"
+								},
+								{
+									"key": "years",
+									"value": "5"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Countries List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective2/countries/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective2", "countries", ""]
+						}
+					}
+				}
+			],
+			"description": "Objective 2: Predict Carbon Emissions using ML models"
+		},
+		{
+			"name": "🔌 Objective 3: Electricity Access",
+			"item": [
+				{
+					"name": "Model Comparison",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/model-comparison/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "model-comparison", ""]
+						}
+					}
+				},
+				{
+					"name": "Historical Data - Nigeria",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/historical-data/?country=Nigeria",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "historical-data", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Nigeria"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Future Predictions - Bangladesh (7 years)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/future-predictions/?country=Bangladesh&years=7",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "future-predictions", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Bangladesh"
+								},
+								{
+									"key": "years",
+									"value": "7"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Distribution Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/distribution/?country=India",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "distribution", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "India"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Combined Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/combined-data/?country=Kenya",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "combined-data", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Kenya"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Policy Markers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/policy-markers/?country=South Africa",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "policy-markers", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "South Africa"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Countries List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/objective3/countries/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "objective3", "countries", ""]
+						}
+					}
+				}
+			],
+			"description": "Objective 3: SDG 7 Electricity Access Classification"
+		},
+		{
+			"name": "📧 Email Alert System",
+			"item": [
+				{
+					"name": "Send Email Alerts to All Countries",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/send-email-alerts/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "send-email-alerts", ""]
+						},
+						"description": "Send automated email alerts to all countries based on electricity access thresholds"
+					}
+				}
+			],
+			"description": "Email alert system APIs for sending notifications to countries"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		}
+	]
+}

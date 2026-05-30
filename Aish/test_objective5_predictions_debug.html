@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Objective 5 Predictions</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Objective 5 Predictions Test</h1>
+    <div>
+        <select id="countrySelect">
+            <option value="Belarus">Belarus</option>
+            <option value="Afghanistan">Afghanistan</option>
+            <option value="Albania">Albania</option>
+        </select>
+        <button onclick="testPredictions()">Test Predictions</button>
+    </div>
+    <div style="width: 800px; height: 400px; margin: 20px 0;">
+        <canvas id="testChart"></canvas>
+    </div>
+    <div id="debug" style="background: #f0f0f0; padding: 10px; margin: 10px 0;"></div>
+
+    <script>
+        let testChart = null;
+        
+        function log(message) {
+            console.log(message);
+            document.getElementById('debug').innerHTML += message + '<br>';
+        }
+        
+        function testPredictions() {
+            const country = document.getElementById('countrySelect').value;
+            log('Testing predictions for: ' + country);
+            
+            const url = `/api/objective5/predictions/?country=${encodeURIComponent(country)}&years=10`;
+            log('Calling: ' + url);
+            
+            fetch(url)
+                .then(response => {
+                    log('Response status: ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    log('Response data: ' + JSON.stringify(data, null, 2));
+                    
+                    if (data.success && data.predictions && data.predictions.length > 0) {
+                        log('✅ API Success! Found ' + data.predictions.length + ' predictions');
+                        
+                        // Create chart
+                        const ctx = document.getElementById('testChart').getContext('2d');
+                        if (testChart) testChart.destroy();
+                        
+                        const years = data.predictions.map(d => d.year);
+                        const values = data.predictions.map(d => d.predicted_access);
+                        
+                        log('Years: ' + JSON.stringify(years));
+                        log('Values: ' + JSON.stringify(values));
+                        
+                        testChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: country + ' - Predicted Access (%)',
+                                    data: values,
+                                    borderColor: 'rgba(56, 239, 125, 1)',
+                                    backgroundColor: 'rgba(56, 239, 125, 0.2)',
+                                    borderWidth: 3,
+                                    borderDash: [10, 5],
+                                    fill: true,
+                                    tension: 0.1,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Test Predictions Chart - ' + country
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: { display: true, text: 'Access (%)' }
+                                    },
+                                    x: {
+                                        title: { display: true, text: 'Year' }
+                                    }
+                                }
+                            }
+                        });
+                        
+                        log('✅ Chart created successfully!');
+                    } else {
+                        log('❌ API failed or no data: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    log('❌ Fetch error: ' + error.message);
+                });
+        }
+    </script>
+</body>
+</html>

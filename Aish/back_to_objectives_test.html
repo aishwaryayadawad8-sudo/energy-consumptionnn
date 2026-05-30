@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Back to Objectives Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-button { 
+            display: inline-block; 
+            padding: 15px 30px; 
+            margin: 10px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover { background: #0056b3; }
+        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Back to Objectives Navigation Test</h1>
+    
+    <div class="section">
+        <h2>Test Different Navigation Options:</h2>
+        
+        <button class="test-button" onclick="window.location.href='/'">
+            Option 1: Root URL (/)
+        </button>
+        
+        <button class="test-button" onclick="window.location.href='/?objectives=true'">
+            Option 2: With Objectives Parameter
+        </button>
+        
+        <button class="test-button" onclick="window.location.href='/?objectives=true&nocache=' + Date.now()">
+            Option 3: With Cache Busting
+        </button>
+        
+        <p><strong>Expected Result:</strong> All buttons should take you to the page with 8 objective cards</p>
+        <p><strong>Page Title Should Be:</strong> "Energy & emissions projections 2050 - EnerOutlook"</p>
+    </div>
+    
+    <div class="section">
+        <h2>Direct Links for Comparison:</h2>
+        <ul>
+            <li><a href="/">Root Page</a> - Should show 8 objective cards</li>
+            <li><a href="/explore/">Explore Dashboard</a> - Should show explore page</li>
+            <li><a href="/objective1/">Objective 1</a> - Individual objective</li>
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Click each test button above</li>
+            <li>Verify you see the page with 8 objective cards</li>
+            <li>If any button shows a different page, that indicates the issue</li>
+            <li>The correct page should have cards for: Total Energy Consumption, Electricity Access, Renewable Energy, etc.</li>
+        </ol>
+    </div>
+</body>
+</html>

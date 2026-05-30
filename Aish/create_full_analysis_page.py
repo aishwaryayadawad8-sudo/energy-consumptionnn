@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Create the full analysis page combining dashboard and ML comparison"""
+
+html_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Analysis - SDG 7 Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .section-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .section-header h1 {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .dashboard-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .back-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #667eea;
+        }
+        
+        iframe {
+            width: 100%;
+            border: none;
+            min-height: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <button class="back-button" onclick="window.location.href='/'">
+            <i class="fas fa-arrow-left"></i> Back to Objectives
+        </button>
+        
+        <div class="section-header">
+            <h1><i class="fas fa-chart-line"></i> Complete SDG 7 Analysis</h1>
+            <p>Full Dashboard + Comprehensive ML Model Comparison</p>
+        </div>
+        
+        <!-- SECTION 1: FULL DASHBOARD -->
+        <div class="dashboard-section">
+            <div class="section-title">
+                <i class="fas fa-globe"></i> Full Dashboard: Comprehensive Energy Analysis
+            </div>
+            <div class="section-subtitle">
+                Complete energy analysis with world map and status alerts
+            </div>
+            
+            <iframe id="dashboard-frame" src="/dashboard/"></iframe>
+        </div>
+        
+        <!-- SECTION 2: COMPREHENSIVE ML COMPARISON -->
+        <div class="dashboard-section">
+            <div class="section-title">
+                <i class="fas fa-chart-bar"></i> Comprehensive ML Model Comparison
+            </div>
+            <div class="section-subtitle">
+                Compare 7 ML algorithms across all 8 sub-objectives
+            </div>
+            
+            <iframe id="comparison-frame" src="/comprehensive-comparison/"></iframe>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+'''
+
+# Write the file
+with open('sustainable_energy/dashboard/templates/dashboard/full_analysis.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("✅ Full analysis page created successfully!")
+print("📄 File: sustainable_energy/dashboard/templates/dashboard/full_analysis.html")

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Navigation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        button { padding: 15px 30px; font-size: 18px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Back to Objectives Navigation Test</h1>
+    
+    <div class="test-section">
+        <h2>Test the Back Button Navigation:</h2>
+        <button onclick="window.location.href='/'">
+            Back to Objectives (Test)
+        </button>
+        <p><strong>Expected:</strong> Should take you to page with 8 objective cards</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Direct Navigation Links:</h2>
+        <ul>
+            <li><a href="/">Root Page (/)</a> - Should show objectives page</li>
+            <li><a href="/objective1/">Objective 1</a> - Individual objective page</li>
+            <li><a href="/explore/">Explore Dashboard</a> - Explore page</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>Troubleshooting Steps:</h2>
+        <ol>
+            <li>Click the blue "Back to Objectives" button above</li>
+            <li>You should see a page with 8 objective cards</li>
+            <li>If not, try: Ctrl+F5 (hard refresh)</li>
+            <li>Or try: Clear browser cache and cookies</li>
+            <li>Or try: Open in incognito/private mode</li>
+        </ol>
+    </div>
+</body>
+</html>

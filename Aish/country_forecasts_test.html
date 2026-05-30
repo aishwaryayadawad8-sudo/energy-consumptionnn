@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Country Forecasts Navigation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-button { 
+            display: inline-block; 
+            padding: 15px 30px; 
+            margin: 10px; 
+            background: #28a745; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover { background: #218838; }
+        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .wrong { background: #dc3545; }
+        .wrong:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Country Forecasts Navigation Test</h1>
+    
+    <div class="section">
+        <h2>✅ CORRECT Navigation (What Back Button Should Do):</h2>
+        
+        <button class="test-button" onclick="window.location.href='/country-forecasts/'">
+            Go to Country Forecasts Page
+        </button>
+        
+        <p><strong>Expected:</strong> Page with 8 objective cards titled "Country Energy Forecasts - All Objectives"</p>
+    </div>
+    
+    <div class="section">
+        <h2>❌ WRONG Navigation (What You Don't Want):</h2>
+        
+        <button class="test-button wrong" onclick="window.location.href='/'">
+            Go to Main Page (Wrong)
+        </button>
+        
+        <button class="test-button wrong" onclick="window.location.href='/explore/'">
+            Go to Explore Dashboard (Wrong)
+        </button>
+        
+        <p><strong>These should NOT be what Back to Objectives shows</strong></p>
+    </div>
+    
+    <div class="section">
+        <h2>🧪 Test Instructions:</h2>
+        <ol>
+            <li>Click "Go to Country Forecasts Page" above</li>
+            <li>Verify you see a page with 8 objective cards</li>
+            <li>Page title should be "Energy & emissions projections 2050 - EnerOutlook"</li>
+            <li>You should see cards for: Total Energy, Electricity Access, Renewable Energy, etc.</li>
+            <li>If this works, then "Back to Objectives" will work correctly</li>
+        </ol>
+    </div>
+</body>
+</html>

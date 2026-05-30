@@ -1,0 +1,388 @@
+/* Ultra-Unique Morphing and 3D Effects */
+
+/* Morphing Logo Animation */
+.logo-orb {
+    position: relative;
+    background: 
+        conic-gradient(from 0deg at 50% 50%, 
+            #ff0080 0deg, 
+            #00ff80 72deg, 
+            #8000ff 144deg, 
+            #ff8000 216deg, 
+            #0080ff 288deg, 
+            #ff0080 360deg);
+    animation: morphLogo 8s ease-in-out infinite, orbRotate 4s linear infinite;
+    filter: blur(0.5px) brightness(1.2);
+    box-shadow: 
+        0 0 40px rgba(255, 0, 128, 0.6),
+        0 0 80px rgba(0, 255, 128, 0.4),
+        inset 0 0 40px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes morphLogo {
+    0%, 100% { 
+        border-radius: 50%; 
+        transform: scale(1) rotate(0deg);
+    }
+    25% { 
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; 
+        transform: scale(1.1) rotate(90deg);
+    }
+    50% { 
+        border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; 
+        transform: scale(0.9) rotate(180deg);
+    }
+    75% { 
+        border-radius: 40% 60% 60% 40% / 60% 40% 40% 60%; 
+        transform: scale(1.05) rotate(270deg);
+    }
+}
+
+/* Holographic Text with Glitch Effect */
+.title-holo {
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate, glitchText 5s infinite;
+}
+
+.title-holo::before,
+.title-holo::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff0080, #00ff80, #8000ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.title-holo::before {
+    animation: glitch1 2s infinite;
+    z-index: -1;
+}
+
+.title-holo::after {
+    animation: glitch2 2s infinite;
+    z-index: -2;
+}
+
+@keyframes glitchText {
+    0%, 90%, 100% { transform: translate(0); }
+    10% { transform: translate(-2px, 2px); }
+    20% { transform: translate(2px, -2px); }
+    30% { transform: translate(-2px, -2px); }
+    40% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, 2px); }
+    60% { transform: translate(2px, -2px); }
+    70% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+}
+
+@keyframes glitch1 {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+}
+
+@keyframes glitch2 {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(2px, 0px); }
+    40% { transform: translate(-2px, 0px); }
+    60% { transform: translate(0px, 2px); }
+    80% { transform: translate(0px, -2px); }
+}
+
+/* 3D Floating Navigation Icons */
+.quantum-sphere {
+    transform-style: preserve-3d;
+    position: relative;
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 70%),
+        conic-gradient(from 0deg, 
+            rgba(255, 0, 128, 0.3) 0deg, 
+            rgba(0, 255, 128, 0.3) 120deg, 
+            rgba(128, 0, 255, 0.3) 240deg, 
+            rgba(255, 0, 128, 0.3) 360deg);
+    animation: float3D 6s ease-in-out infinite;
+}
+
+.quantum-sphere::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent, rgba(255, 0, 128, 0.5), transparent);
+    animation: rotate3D 3s linear infinite;
+    z-index: -1;
+}
+
+@keyframes float3D {
+    0%, 100% { 
+        transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
+    }
+    33% { 
+        transform: translateY(-10px) rotateX(15deg) rotateY(120deg); 
+    }
+    66% { 
+        transform: translateY(5px) rotateX(-10deg) rotateY(240deg); 
+    }
+}
+
+@keyframes rotate3D {
+    0% { transform: rotateZ(0deg); }
+    100% { transform: rotateZ(360deg); }
+}
+
+/* Quantum Tunnel Effect for Cards */
+.quantum-card {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    position: relative;
+    overflow: visible;
+}
+
+.quantum-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    transform: translate(-50%, -50%) rotateX(75deg);
+    background: 
+        repeating-conic-gradient(from 0deg at 50% 50%, 
+            transparent 0deg, 
+            rgba(0, 255, 255, 0.1) 10deg, 
+            transparent 20deg);
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.5s ease;
+    z-index: -1;
+    animation: tunnelSpin 10s linear infinite;
+}
+
+.quantum-card:hover::before {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotateX(75deg) scale(1.2);
+}
+
+@keyframes tunnelSpin {
+    0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
+    100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+}
+
+/* Morphing Button with Liquid Effect */
+.cta-holo {
+    position: relative;
+    overflow: hidden;
+    background: 
+        linear-gradient(135deg, 
+            rgba(255, 0, 128, 0.2) 0%, 
+            rgba(0, 255, 128, 0.2) 50%, 
+            rgba(128, 0, 255, 0.2) 100%);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: morphButton 4s ease-in-out infinite;
+}
+
+.cta-holo::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: conic-gradient(from 0deg, #ff0080, #00ff80, #8000ff, #ff0080);
+    border-radius: inherit;
+    z-index: -1;
+    animation: borderRotate 3s linear infinite;
+}
+
+@keyframes morphButton {
+    0%, 100% { border-radius: 50px; }
+    25% { border-radius: 20px 50px 20px 50px; }
+    50% { border-radius: 10px; }
+    75% { border-radius: 50px 20px 50px 20px; }
+}
+
+@keyframes borderRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Holographic Scan Lines */
+.holo-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            rgba(0, 255, 255, 0.03) 1px,
+            transparent 2px,
+            transparent 4px
+        );
+    animation: scanLines 2s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scanLines {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+/* Quantum Particle System Enhancement */
+.particle-background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, rgba(255, 0, 128, 0.8), transparent),
+        radial-gradient(1px 1px at 40px 70px, rgba(0, 255, 128, 0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(128, 0, 255, 0.8), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 128, 0, 0.8), transparent),
+        radial-gradient(1px 1px at 160px 30px, rgba(0, 128, 255, 0.8), transparent);
+    background-repeat: repeat;
+    background-size: 250px 150px;
+    animation: quantumParticles 25s linear infinite;
+}
+
+@keyframes quantumParticles {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-250px, -150px) rotate(360deg); }
+}
+
+/* Neural Network Connections */
+.quantum-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(45deg, transparent 48%, rgba(0, 255, 255, 0.1) 49%, rgba(0, 255, 255, 0.1) 51%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(255, 0, 128, 0.1) 49%, rgba(255, 0, 128, 0.1) 51%, transparent 52%);
+    background-size: 100px 100px;
+    animation: neuralNetwork 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes neuralNetwork {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+/* Holographic Data Stream */
+.main-title-holo::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            rgba(0, 255, 255, 0.1) 1px,
+            transparent 2px,
+            transparent 20px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            rgba(255, 0, 128, 0.1) 1px,
+            transparent 2px,
+            transparent 20px
+        );
+    animation: dataStream 3s linear infinite;
+    z-index: -1;
+}
+
+@keyframes dataStream {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+}
+
+/* Quantum Ripple Effect on Hover */
+.quantum-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+.quantum-icon:hover::after {
+    width: 200px;
+    height: 200px;
+    animation: quantumRipple 1s ease-out;
+}
+
+@keyframes quantumRipple {
+    0% { 
+        width: 0; 
+        height: 0; 
+        opacity: 1; 
+    }
+    100% { 
+        width: 200px; 
+        height: 200px; 
+        opacity: 0; 
+    }
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .quantum-sphere {
+        animation: float3D 4s ease-in-out infinite;
+    }
+    
+    .morphButton {
+        animation-duration: 3s;
+    }
+    
+    .title-holo {
+        animation-duration: 2s;
+    }
+}
+
+/* Ultra-Unique Cursor Trail */
+.cursor-trail {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.6) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: screen;
+    animation: cursorPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes cursorPulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.2); opacity: 0.4; }
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 6: Energy Access Classification</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 600px;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-chart-pie"></i> Objective 6: Energy Access Classification</h1>
+            <p class="text-muted">Classify energy access levels with accuracy metrics and view all countries</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> Model Accuracy Comparison</h2>
+            <p class="text-muted">Higher Accuracy = Better Model Performance</p>
+            <div id="modelComparisonLoading" class="loading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Training models and comparing accuracy...</p>
+            </div>
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div id="accuracyChart" class="chart-container"></div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-history"></i> Historical Electricity Access per Country</h2>
+            <p class="text-muted">Click on countries in the legend to show/hide them</p>
+            <div id="historicalLoading" class="loading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Loading historical data...</p>
+            </div>
+            <div id="historicalChart" class="chart-container"></div>
+        </div>
+        
+        <!-- Combined Historical + Future Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Energy Access Classification (Historical + Future)</h2>
+            <p class="text-muted">Historical data + Future predictions for all countries</p>
+            <div id="combinedLoading" class="loading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Loading combined data...</p>
+            </div>
+            <div id="combinedChart" class="chart-container"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.onload = function() {
+            console.log('Page loaded, initializing Objective 6...');
+            loadModelComparison();
+            loadHistoricalData();
+            loadCombinedData();
+        };
+        
+        function loadModelComparison() {
+            fetch('/api/objective6/model-comparison/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('modelComparisonLoading').style.display = 'none';
+                    
+                    if (data.success) {
+                        // Get accuracy scores directly
+                        const models = Object.keys(data.mse_scores);
+                        const accuracyValues = Object.values(data.mse_scores);
+                        
+                        const trace = {
+                            x: models,
+                            y: accuracyValues,
+                            type: 'bar',
+                            marker: {
+                                color: ['rgba(102, 194, 165, 0.8)', 'rgba(252, 141, 98, 0.8)', 
+                                        'rgba(141, 160, 203, 0.8)', 'rgba(231, 138, 195, 0.8)']
+                            },
+                            text: accuracyValues.map(v => v.toFixed(4)),
+                            textposition: 'outside',
+                            textfont: { size: 12 }
+                        };
+                        
+                        const layout = {
+                            title: {
+                                text: 'Model Comparison - Energy Access Classification Accuracy',
+                                font: { size: 16 }
+                            },
+                            xaxis: { 
+                                title: 'Model',
+                                tickfont: { size: 11 }
+                            },
+                            yaxis: { 
+                                title: 'Accuracy',
+                                range: [0, 1.05],
+                                tickfont: { size: 11 }
+                            },
+                            height: 500,
+                            showlegend: true,
+                            legend: {
+                                x: 1.02,
+                                y: 1,
+                                title: { text: 'Model' }
+                            },
+                            plot_bgcolor: 'rgba(240, 248, 255, 0.5)',
+                            paper_bgcolor: 'white'
+                        };
+                        
+                        Plotly.newPlot('accuracyChart', [trace], layout, {responsive: true});
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('modelComparisonLoading').style.display = 'none';
+                    console.error('Error:', error);
+                });
+        }
+        
+        function loadHistoricalData() {
+            fetch('/api/objective6/historical/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    
+                    if (data.success && data.data.length > 0) {
+                        // Group data by country
+                        const countries = {};
+                        data.data.forEach(d => {
+                            if (!countries[d.Entity]) {
+                                countries[d.Entity] = { years: [], access: [] };
+                            }
+                            countries[d.Entity].years.push(d.Year);
+                            countries[d.Entity].access.push(d['Access to electricity (% of population)']);
+                        });
+                        
+                        // Create traces for each country
+                        const traces = [];
+                        let firstCountry = true;
+                        Object.keys(countries).sort().forEach(country => {
+                            traces.push({
+                                x: countries[country].years,
+                                y: countries[country].access,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                name: country,
+                                visible: firstCountry ? true : 'legendonly',  // Only first country visible
+                                line: { width: 2 },
+                                marker: { size: 4 }
+                            });
+                            firstCountry = false;
+                        });
+                        
+                        const layout = {
+                            title: 'Historical Electricity Access per Country (Click Country to View)',
+                            xaxis: { title: 'Year' },
+                            yaxis: { title: 'Access to electricity (% of population)', range: [0, 100] },
+                            height: 600,
+                            showlegend: true,
+                            legend: { x: 1.05, y: 1 }
+                        };
+                        
+                        Plotly.newPlot('historicalChart', traces, layout);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    console.error('Error:', error);
+                });
+        }
+        
+        function loadCombinedData() {
+            fetch('/api/objective6/historical/')
+                .then(response => response.json())
+                .then(async data => {
+                    if (data.success) {
+                        // Get predictions
+                        const predResponse = await fetch('/api/objective6/predictions/?years=10');
+                        const predData = await predResponse.json();
+                        
+                        document.getElementById('combinedLoading').style.display = 'none';
+                        
+                        if (predData.success) {
+                            // Group historical data by country
+                            const countries = {};
+                            data.data.forEach(d => {
+                                if (!countries[d.Entity]) {
+                                    countries[d.Entity] = { 
+                                        historical: { years: [], access: [] },
+                                        predicted: { years: [], access: [] }
+                                    };
+                                }
+                                countries[d.Entity].historical.years.push(d.Year);
+                                countries[d.Entity].historical.access.push(d['Access to electricity (% of population)']);
+                            });
+                            
+                            // Add predictions
+                            predData.predictions.forEach(p => {
+                                if (countries[p.country]) {
+                                    countries[p.country].predicted.years.push(p.year);
+                                    // Convert access level to approximate percentage
+                                    const accessMap = {'Low Access': 25, 'Medium Access': 70, 'High Access': 95};
+                                    countries[p.country].predicted.access.push(accessMap[p.predicted_access_level] || 50);
+                                }
+                            });
+                            
+                            // Create traces
+                            const traces = [];
+                            let firstCountry = true;
+                            Object.keys(countries).sort().forEach(country => {
+                                // Historical trace
+                                traces.push({
+                                    x: countries[country].historical.years,
+                                    y: countries[country].historical.access,
+                                    type: 'scatter',
+                                    mode: 'lines+markers',
+                                    name: `${country} (Historical)`,
+                                    visible: firstCountry ? true : 'legendonly',
+                                    line: { width: 2 },
+                                    marker: { size: 4 }
+                                });
+                                
+                                // Predicted trace
+                                if (countries[country].predicted.years.length > 0) {
+                                    traces.push({
+                                        x: countries[country].predicted.years,
+                                        y: countries[country].predicted.access,
+                                        type: 'scatter',
+                                        mode: 'lines+markers',
+                                        name: `${country} (Predicted)`,
+                                        visible: firstCountry ? true : 'legendonly',
+                                        line: { width: 2, dash: 'dash' },
+                                        marker: { size: 4 }
+                                    });
+                                }
+                                firstCountry = false;
+                            });
+                            
+                            const layout = {
+                                title: 'Energy Access Classification per Country (Historical + Future)',
+                                xaxis: { title: 'Year' },
+                                yaxis: { title: 'Access to electricity (% of population)', range: [0, 100] },
+                                height: 600,
+                                showlegend: true,
+                                legend: { x: 1.05, y: 1 }
+                            };
+                            
+                            Plotly.newPlot('combinedChart', traces, layout);
+                        }
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('combinedLoading').style.display = 'none';
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

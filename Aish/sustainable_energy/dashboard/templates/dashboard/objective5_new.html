@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 4: SDG 7 Electricity Access Classification</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 450px;
+            margin-top: 20px;
+        }
+        
+        .country-select {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .country-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-load {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        
+        .btn-load:hover {
+            opacity: 0.9;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .access-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            margin: 0 5px;
+            display: inline-block;
+        }
+        
+        .badge-low-access {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .badge-medium-access {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .badge-high-access {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .policy-marker {
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-bolt"></i> Objective 4: SDG 7 Electricity Access Classification</h1>
+            <p class="text-muted">Classify electricity access levels (Low/Medium/High) and predict future trends using machine learning</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> Model Comparison (MSE Scores)</h2>
+            <p class="text-muted">Lower MSE = Better Model Performance</p>
+            <button class="btn btn-load" onclick="loadModelComparison()">
+                <i class="fas fa-sync-alt"></i> Load Model Comparison
+            </button>
+            <div id="modelComparisonLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Training models and comparing performance...</p>
+            </div>
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div class="chart-container">
+                <canvas id="mseChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Country Selection -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-globe"></i> Select Country for Analysis</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select">
+                        <option value="">Loading countries...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-load w-100" onclick="loadCountryData()">
+                        <i class="fas fa-search"></i> Analyze Country
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-history"></i> Historical Electricity Access</h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div class="chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Combined Historical + Future Section -->
+        <div class="section-card" id="combinedSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Electricity Access Levels (Historical + Future)</h2>
+            <p class="text-muted" id="combinedCountryName"></p>
+            <div class="chart-container">
+                <canvas id="combinedChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Policy Impact Section -->
+        <div class="section-card" id="policySection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-landmark"></i> SDG 7 Tracking: Policy Interventions</h2>
+            <p class="text-muted">Key policy interventions and their impact on electricity access</p>
+            <div id="policyMarkers" style="margin-bottom: 20px;"></div>
+            <div class="chart-container">
+                <canvas id="policyChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let mseChart = null;
+        let historicalChart = null;
+        let combinedChart = null;
+        let policyChart = null;
+        
+        // Load countries on page load
+        window.onload = function() {
+            console.log('Page loaded, initializing Objective 4...');
+            loadCountries();
+        };
+        
+        function loadCountries() {
+            console.log('Loading countries...');
+            fetch('/api/objective4/countries/')
+                .then(response => {
+                    console.log('Countries response received:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Countries data:', data);
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                        console.log(`✓ Loaded ${data.countries.length} countries`);
+                    } else {
+                        console.error('Countries API returned success=false');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading countries:', error);
+                    alert('Error loading countries. Check console for details.');
+                });
+        }
+        
+        function loadModelComparison() {
+            console.log('Loading model comparison...');
+            document.getElementById('modelComparisonLoading').style.display = 'block';
+            
+            fetch('/api/objective4/model-comparison/')
+                .then(response => {
+                    console.log('Model comparison response:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Model comparison data:', data);
+                    document.getElementById('modelComparisonLoading').style.display = 'none';
+                    
+                    if (data.error) {
+                        console.error('Server error:', data.error);
+                        alert('Server error: ' + data.error);
+                        return;
+                    }
+                    
+                    if (data.success) {
+                        // Create chart
+                        const ctx = document.getElementById('mseChart').getContext('2d');
+                        
+                        if (mseChart) {
+                            mseChart.destroy();
+                        }
+                        
+                        const models = Object.keys(data.mse_scores);
+                        const mseValues = Object.values(data.mse_scores);
+                        
+                        console.log('Creating MSE chart with models:', models);
+                        
+                        mseChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: models,
+                                datasets: [{
+                                    label: 'MSE Score',
+                                    data: mseValues,
+                                    backgroundColor: [
+                                        'rgba(102, 126, 234, 0.7)',
+                                        'rgba(118, 75, 162, 0.7)',
+                                        'rgba(39, 174, 96, 0.7)',
+                                        'rgba(243, 156, 18, 0.7)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(102, 126, 234, 1)',
+                                        'rgba(118, 75, 162, 1)',
+                                        'rgba(39, 174, 96, 1)',
+                                        'rgba(243, 156, 18, 1)'
+                                    ],
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Classification Model MSE (Lower is Better)',
+                                        font: {
+                                            size: 16
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Mean Squared Error'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('modelComparisonLoading').style.display = 'none';
+                    console.error('Error:', error);
+                    alert('Error loading model comparison');
+                });
+        }
+        
+        function loadCountryData() {
+            const country = document.getElementById('countrySelect').value;
+            
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            
+            // Load historical data
+            loadHistoricalData(country);
+            
+            // Load combined historical + future data
+            loadCombinedData(country);
+            
+            // Load policy markers if applicable
+            loadPolicyData(country);
+        }
+        
+        function loadHistoricalData(country) {
+            fetch(`/api/objective4/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        document.getElementById('historicalSection').style.display = 'block';
+                        document.getElementById('historicalCountryName').textContent = 
+                            `Electricity access trends for ${country}`;
+                        
+                        const ctx = document.getElementById('historicalChart').getContext('2d');
+                        
+                        if (historicalChart) {
+                            historicalChart.destroy();
+                        }
+                        
+                        const years = data.data.map(d => d.Year);
+                        const access = data.data.map(d => d['Access to electricity (% of population)']);
+                        
+                        historicalChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Electricity Access (%)',
+                                    data: access,
+                                    borderColor: 'rgba(102, 126, 234, 1)',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: {
+                                            display: true,
+                                            text: 'Access (%)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading historical data:', error));
+        }
+        
+        function loadCombinedData(country) {
+            fetch(`/api/objective4/combined/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        document.getElementById('combinedSection').style.display = 'block';
+                        document.getElementById('combinedCountryName').textContent = 
+                            `Historical and predicted access levels for ${country}`;
+                        
+                        const ctx = document.getElementById('combinedChart').getContext('2d');
+                        
+                        if (combinedChart) {
+                            combinedChart.destroy();
+                        }
+                        
+                        // Separate historical and predicted data
+                        const historical = data.data.filter(d => d.type === 'historical');
+                        const predicted = data.data.filter(d => d.type === 'predicted');
+                        
+                        const levelMap = {'Low Access': 1, 'Medium Access': 2, 'High Access': 3};
+                        
+                        const histYears = historical.map(d => d.year);
+                        const histLevels = historical.map(d => levelMap[d.access_level]);
+                        
+                        const predYears = predicted.map(d => d.year);
+                        const predLevels = predicted.map(d => levelMap[d.access_level]);
+                        
+                        combinedChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                datasets: [{
+                                    label: 'Historical',
+                                    data: histYears.map((year, i) => ({x: year, y: histLevels[i]})),
+                                    borderColor: 'rgba(102, 126, 234, 1)',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    borderWidth: 3,
+                                    stepped: true
+                                }, {
+                                    label: 'Predicted',
+                                    data: predYears.map((year, i) => ({x: year, y: predLevels[i]})),
+                                    borderColor: 'rgba(243, 156, 18, 1)',
+                                    backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                                    borderWidth: 3,
+                                    borderDash: [5, 5],
+                                    stepped: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        min: 0,
+                                        max: 4,
+                                        ticks: {
+                                            stepSize: 1,
+                                            callback: function(value) {
+                                                const labels = {1: 'Low Access', 2: 'Medium Access', 3: 'High Access'};
+                                                return labels[value] || '';
+                                            }
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Access Level'
+                                        }
+                                    },
+                                    x: {
+                                        type: 'linear',
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading combined data:', error));
+        }
+        
+        function loadPolicyData(country) {
+            // Load policy markers for specific countries
+            const policyCountries = ['India', 'Bangladesh', 'Kenya', 'Nigeria', 'Brazil'];
+            
+            if (!policyCountries.includes(country)) {
+                document.getElementById('policySection').style.display = 'none';
+                return;
+            }
+            
+            fetch(`/api/objective4/policy-markers/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.policy_markers.length > 0) {
+                        document.getElementById('policySection').style.display = 'block';
+                        
+                        // Display policy markers
+                        const markersHtml = data.policy_markers.map(m => 
+                            `<div class="policy-marker">
+                                <i class="fas fa-flag"></i> ${m.country} Policy (${m.year}): ${m.electricity_access.toFixed(1)}% access
+                            </div>`
+                        ).join('');
+                        document.getElementById('policyMarkers').innerHTML = markersHtml;
+                        
+                        // Load historical data for policy chart
+                        fetch(`/api/objective4/historical/?country=${encodeURIComponent(country)}`)
+                            .then(response => response.json())
+                            .then(histData => {
+                                if (histData.success) {
+                                    const ctx = document.getElementById('policyChart').getContext('2d');
+                                    
+                                    if (policyChart) {
+                                        policyChart.destroy();
+                                    }
+                                    
+                                    const years = histData.data.map(d => d.Year);
+                                    const access = histData.data.map(d => d['Access to electricity (% of population)']);
+                                    
+                                    policyChart = new Chart(ctx, {
+                                        type: 'line',
+                                        data: {
+                                            labels: years,
+                                            datasets: [{
+                                                label: 'Electricity Access (%)',
+                                                data: access,
+                                                borderColor: 'rgba(52, 152, 219, 1)',
+                                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                                borderWidth: 3,
+                                                fill: true,
+                                                tension: 0.4
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    display: true
+                                                },
+                                                annotation: {
+                                                    annotations: data.policy_markers.map(m => ({
+                                                        type: 'line',
+                                                        xMin: m.year,
+                                                        xMax: m.year,
+                                                        borderColor: 'rgba(231, 76, 60, 0.8)',
+                                                        borderWidth: 2,
+                                                        borderDash: [5, 5],
+                                                        label: {
+                                                            content: `Policy ${m.year}`,
+                                                            enabled: true,
+                                                            position: 'top'
+                                                        }
+                                                    }))
+                                                }
+                                            },
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    max: 100,
+                                                    title: {
+                                                        display: true,
+                                                        text: 'Electricity Access (%)'
+                                                    }
+                                                },
+                                                x: {
+                                                    title: {
+                                                        display: true,
+                                                        text: 'Year'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                })
+                .catch(error => console.error('Error loading policy data:', error));
+        }
+    </script>
+</body>
+</html>

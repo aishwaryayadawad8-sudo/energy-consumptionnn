@@ -1,0 +1,1472 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 4: SDG-7 Progress Monitoring</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+        /* Import Professional Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Roboto', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        /* Professional Header */
+        .top-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: #00bcd4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: #f7931e;
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        /* Main Container */
+        .dashboard-container {
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+        
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            width: 100%;
+        }
+        
+        /* Professional Section Cards */
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-left: 5px solid #00bcd4;
+            transition: all 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .section-title {
+            color: #1e3c72;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-top: 20px;
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .interactive-chart-container {
+            position: relative;
+            height: 600px;
+            margin-top: 20px;
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        /* Form Elements */
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .form-label {
+            color: #1e3c72;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        .country-select {
+            border-radius: 8px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            font-size: 15px;
+            font-weight: 500;
+            background: white;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .country-select:focus {
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+            outline: none;
+        }
+        
+        .btn-load {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.3);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-load:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+        
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 3px;
+            border-color: #00bcd4;
+            border-top-color: transparent;
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        /* Grid System */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            padding: 0 15px;
+        }
+        
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            padding: 0 15px;
+        }
+        
+        .col-12 {
+            flex: 0 0 100%;
+            padding: 0 15px;
+        }
+        
+        /* Text Styling */
+        .text-muted {
+            color: #666 !important;
+            font-weight: 400;
+        }
+        
+        .mt-2 { margin-top: 0.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .w-100 { width: 100%; }
+        
+        /* Professional Info Cards */
+        .info-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00bcd4;
+        }
+        
+        .info-card h4 {
+            color: #1e3c72;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-card p {
+            color: #555;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .site-title {
+                font-size: 1.2rem;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .section-card {
+                padding: 20px;
+            }
+            
+            .chart-container,
+            .interactive-chart-container {
+                height: 400px;
+                padding: 20px;
+            }
+            
+            .col-md-8,
+            .col-md-4 {
+                flex: 0 0 100%;
+                margin-bottom: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        /* Tablet Responsive */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .chart-container,
+            .interactive-chart-container {
+                height: 450px;
+            }
+        }
+        
+        /* Large Screen Optimization */
+        @media (min-width: 1200px) {
+            .chart-container {
+                height: 550px;
+            }
+            
+            .interactive-chart-container {
+                height: 650px;
+            }
+        }
+        
+        /* Smooth Animations */
+        .section-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .section-card:nth-child(2) { animation-delay: 0.1s; }
+        .section-card:nth-child(3) { animation-delay: 0.2s; }
+        .section-card:nth-child(4) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Enhanced Canvas Quality */
+        canvas {
+            border-radius: 8px;
+        }
+        
+        /* Professional Scrollbar */
+        .dashboard-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .dashboard-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .dashboard-container::-webkit-scrollbar-thumb {
+            background: #00bcd4;
+            border-radius: 4px;
+        }
+        
+        .dashboard-container::-webkit-scrollbar-thumb:hover {
+            background: #0097a7;
+        }
+    </style>
+</head>
+<body><body>
+    <!-- Professional Header -->
+    <header class="top-header">
+        <div class="nav-container">
+            <div class="logo-section">
+                <div class="logo">E</div>
+                <h1 class="site-title">Objective 4: SDG-7 Progress Monitoring</h1>
+            </div>
+            <a onclick="window.location.href='/country-forecasts/?t=1766296981'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Objectives</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="content-area">
+        <!-- Model Comparison Section (Loads First) -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> SDG-7 Progress Monitoring - Model Comparison</h2>
+            <p class="text-muted">Instant model comparison - Lower MSE = Better Model Performance</p>
+            <div id="modelComparisonLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Training and comparing 7 ML models...</p>
+            </div>
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div class="chart-container" style="display: none;" id="mseChartContainer">
+                <canvas id="mseChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Country Selection (Shows After Model Comparison) -->
+        <div class="section-card" id="countrySelectionSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-globe"></i> Select Country for Analysis</h2>
+            <p class="text-muted">Load the SDG 7 interactive chart with all countries OR get detailed analysis for a specific country</p>
+            <div class="row">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select">
+                        <option value="">-- SDG 7: All Countries Chart --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-load w-100" onclick="loadCountryData()">
+                        <i class="fas fa-chart-line"></i> Analyze Country
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <small class="text-muted">
+                        💡 <strong>Instructions:</strong> Select "SDG 7: All Countries Chart" for interactive visualization, or choose specific country for detailed analysis, then click "Analyze Country"
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> SDG 7: Access to Electricity Over Time</h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div class="interactive-chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+                <!-- Future Predictions Section -->
+        <div class="section-card" id="predictionsSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-crystal-ball"></i> Future Predictions (Next 7 Years)</h2>
+            <p class="text-muted" id="predictionsCountryName"></p>
+            <div class="chart-container">
+                <canvas id="predictionsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Combined Historical + Future Access Levels -->
+        <div class="section-card" id="combinedAccessLevelsSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-chart-area"></i> Electricity Access Levels (Historical + Future)</h2>
+            <p class="text-muted" id="combinedAccessCountryName"></p>
+            <div class="interactive-chart-container">
+                <canvas id="combinedAccessChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+    </div>
+    
+            </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // High-DPI Canvas Configuration
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        Chart.defaults.font.size = 13;
+        Chart.defaults.font.weight = '500';
+        Chart.defaults.color = '#374151';
+        Chart.defaults.borderColor = 'rgba(229, 231, 235, 0.8)';
+        Chart.defaults.backgroundColor = 'rgba(249, 250, 251, 0.8)';
+        
+        // Device Pixel Ratio for Retina Displays
+        Chart.defaults.devicePixelRatio = window.devicePixelRatio || 2;
+        
+        
+        let mseChart = null;
+        let historicalChart = null;
+        let predictionsChart = null;
+        
+        // Load model comparison automatically on page load
+        window.onload = function() {
+            console.log('🚀 [OBJ4] Page loaded, loading model comparison instantly...');
+            loadModelComparison();
+        };
+        
+        function loadModelComparison() {
+            console.log('🚀 [OBJ4] Loading model comparison instantly...');
+            
+            // Hide loading spinner immediately
+            // Loading complete - chart appears instantly
+            
+            // Hardcoded data from SDG 7 Monitoring (regression)
+            const modelData = {
+                "Linear Regression": 0.2276,
+                "Decision Tree": 0.0251,
+                "KNN": 0.0662,
+                "XGBoost": 0.0142,
+                "LightGBM": 0.0160,
+                "CatBoost": 0.0096,      // Best model (lowest MSE)
+                "Random Forest": 0.0120
+            };
+            
+            const bestModel = "CatBoost";
+            const bestMSE = 0.0096;
+            
+            console.log('📊 [OBJ4] Using hardcoded model data for instant loading');
+            
+            // Show chart container immediately
+            document.getElementById('mseChartContainer').style.display = 'block';
+            
+            // Create chart instantly
+            const ctx = document.getElementById('mseChart').getContext('2d');
+            
+            if (mseChart) {
+                mseChart.destroy();
+            }
+            
+            const models = Object.keys(modelData);
+            const mseValues = Object.values(modelData);
+            
+            // Find best model index for gold highlighting
+            const bestIndex = mseValues.indexOf(Math.min(...mseValues));
+            
+            // Create colors array - gold for best, blue for others
+            const colors = mseValues.map((val, idx) => 
+                idx === bestIndex ? 'rgba(255, 215, 0, 0.8)' : 'rgba(102, 126, 234, 0.7)'
+            );
+            
+            const borderColors = mseValues.map((val, idx) => 
+                idx === bestIndex ? 'rgba(255, 215, 0, 1)' : 'rgba(102, 126, 234, 1)'
+            );
+            
+            mseChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: 'Mean Squared Error (MSE)',
+                        data: mseValues,
+                        backgroundColor: colors,
+                        borderColor: borderColors,
+                        borderWidth: 0,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    devicePixelRatio: window.devicePixelRatio || 2,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Model Comparison: SDG 7 Monitoring (Lower MSE = Better Performance)',
+                            font: {
+                                size: 18,
+                                weight: '700',
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            color: '#1f2937',
+                            padding: 25
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#374151',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            cornerRadius: 12,
+                            padding: 15,
+                            titleFont: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 13,
+                                weight: '500'
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `MSE: ${context.parsed.y.toFixed(4)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Mean Squared Error (MSE)',
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                color: '#374151'
+                            },
+                            grid: {
+                                color: 'rgba(229, 231, 235, 0.8)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#6b7280'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'ML Algorithms',
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                color: '#374151'
+                            },
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#6b7280',
+                                maxRotation: 45
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            console.log('✅ [OBJ4] Model comparison chart created instantly!');
+            
+            // Auto-show country selection after chart is created
+            setTimeout(() => {
+                document.getElementById('countrySelectionSection').style.display = 'block';
+                loadCountries();
+            }, 500);
+        }
+        
+        function loadCountries() {
+            fetch('/api/objective4/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+                function loadCountryData() {
+            const country = document.getElementById('countrySelect').value;
+            
+            if (!country) {
+                // If no country selected, load ALL countries for interactive chart
+                loadAllCountriesHistoricalChart();
+                return;
+            }
+            
+            // Load specific country data
+            loadSpecificCountryData(country);
+        }
+        
+        function loadAllCountriesHistoricalChart() {
+            console.log('🌍 Loading SDG 7: Access to Electricity Over Time chart...');
+            
+            // Show historical section
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('historicalCountryName').textContent = 
+                'SDG 7: Access to Electricity Over Time - Click legend to show/hide countries';
+            
+            // Get all countries first
+            fetch('/api/objective4/countries/')
+                .then(response => response.json())
+                .then(countriesData => {
+                    if (countriesData.success) {
+                        const countries = countriesData.countries;
+                        console.log(`📊 Loading data for ${countries.length} countries...`);
+                        
+                        // Load historical data for all countries
+                        const promises = countries.map(country => 
+                            fetch(`/api/objective4/historical/?country=${encodeURIComponent(country)}`)
+                                .then(response => response.json())
+                                .then(data => ({
+                                    country: country,
+                                    data: data.success ? data.data : []
+                                }))
+                                .catch(error => ({
+                                    country: country,
+                                    data: []
+                                }))
+                        );
+                        
+                        Promise.all(promises).then(allCountryData => {
+                            createInteractiveHistoricalChart(allCountryData);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+                function createInteractiveHistoricalChart(allCountryData) {
+            console.log('📈 Creating SDG 7: Access to Electricity Over Time chart...');
+            
+            const ctx = document.getElementById('historicalChart').getContext('2d');
+            
+            if (historicalChart) {
+                historicalChart.destroy();
+            }
+            
+            // Prepare datasets for all countries (matching the image style)
+            const datasets = [];
+            
+            // Color palette for countries (similar to the image)
+            const colors = [
+                '#1f77b4', // Blue (Afghanistan - visible by default)
+                '#ff7f0e', // Orange
+                '#2ca02c', // Green
+                '#d62728', // Red
+                '#9467bd', // Purple
+                '#8c564b', // Brown
+                '#e377c2', // Pink
+                '#7f7f7f', // Gray
+                '#bcbd22', // Olive
+                '#17becf', // Cyan
+                '#aec7e8', // Light blue
+                '#ffbb78', // Light orange
+                '#98df8a', // Light green
+                '#ff9896', // Light red
+                '#c5b0d5', // Light purple
+                '#c49c94', // Light brown
+                '#f7b6d3', // Light pink
+                '#c7c7c7', // Light gray
+                '#dbdb8d', // Light olive
+                '#9edae5'  // Light cyan
+            ];
+            
+            // Get all unique years from the data
+            let allYears = new Set();
+            allCountryData.forEach(countryInfo => {
+                if (countryInfo.data && countryInfo.data.length > 0) {
+                    countryInfo.data.forEach(d => allYears.add(d.Year));
+                }
+            });
+            allYears = Array.from(allYears).sort();
+            
+            // Create datasets for each country
+            allCountryData.forEach((countryInfo, index) => {
+                if (countryInfo.data && countryInfo.data.length > 0) {
+                    // Create data array aligned with all years
+                    const countryData = {};
+                    countryInfo.data.forEach(d => {
+                        countryData[d.Year] = d['Access to electricity (% of population)'];
+                    });
+                    
+                    const alignedData = allYears.map(year => countryData[year] || null);
+                    
+                    datasets.push({
+                        label: countryInfo.country,
+                        data: alignedData,
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: colors[index % colors.length] + '20', // 20% opacity
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0, // No points by default
+                        pointHoverRadius: 4,
+                        hidden: index > 0, // Hide all except Afghanistan (first country)
+                        spanGaps: true // Connect lines across null values
+                    });
+                }
+            });
+            
+            historicalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allYears,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    devicePixelRatio: window.devicePixelRatio || 2,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            align: 'start',
+                            maxWidth: 280,
+                            labels: {
+                                boxWidth: 15,
+                                padding: 8,
+                                font: {
+                                    size: 12,
+                                    weight: '500',
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                                },
+                                color: '#374151',
+                                usePointStyle: true,
+                                generateLabels: function(chart) {
+                                    const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                    const labels = original.call(this, chart);
+                                    
+                                    // Sort labels alphabetically
+                                    labels.sort((a, b) => a.text.localeCompare(b.text));
+                                    
+                                    return labels;
+                                }
+                            },
+                            onClick: function(e, legendItem, legend) {
+                                const index = legendItem.datasetIndex;
+                                const chart = legend.chart;
+                                
+                                if (chart.isDatasetVisible(index)) {
+                                    chart.hide(index);
+                                    legendItem.hidden = true;
+                                } else {
+                                    chart.show(index);
+                                    legendItem.hidden = false;
+                                }
+                                
+                                chart.update('none');
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'SDG 7: Access to Electricity Over Time',
+                            font: {
+                                size: 20,
+                                weight: '700',
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            color: '#1f2937',
+                            padding: 25
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#374151',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            cornerRadius: 12,
+                            padding: 15,
+                            titleFont: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 13,
+                                weight: '500'
+                            },
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return 'Year: ' + tooltipItems[0].label;
+                                },
+                                label: function(context) {
+                                    if (context.parsed.y !== null) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                    }
+                                    return context.dataset.label + ': No data';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Electricity Access (%)',
+                                font: {
+                                    size: 14,
+                                    weight: '600',
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                                },
+                                color: '#374151'
+                            },
+                            grid: {
+                                color: 'rgba(229, 231, 235, 0.8)',
+                                lineWidth: 1,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#6b7280'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: false
+                            },
+                            grid: {
+                                color: 'rgba(229, 231, 235, 0.6)',
+                                lineWidth: 1,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#6b7280'
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    layout: {
+                        padding: {
+                            right: 30
+                        }
+                    },
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            console.log(`✅ SDG 7 chart created with ${datasets.length} countries`);
+            console.log('💡 Afghanistan visible by default, click legend to show/hide other countries');
+        }
+        
+        function loadSpecificCountryData(country) {
+            console.log(`🔍 Loading specific data for: ${country}`);
+            
+            // Load historical data for specific country
+            fetch(`/api/objective4/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        document.getElementById('historicalSection').style.display = 'block';
+                        document.getElementById('historicalCountryName').textContent = 
+                            `Electricity access trends for ${country}`;
+                        
+                        const ctx = document.getElementById('historicalChart').getContext('2d');
+                        
+                        if (historicalChart) {
+                            historicalChart.destroy();
+                        }
+                        
+                        const years = data.data.map(d => d.Year);
+                        const access = data.data.map(d => d['Access to electricity (% of population)']);
+                        
+                        historicalChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Electricity Access (%)',
+                                    data: access,
+                                    borderColor: 'rgba(102, 126, 234, 1)',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: {
+                                            display: true,
+                                            text: 'Access (%)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading historical data:', error));
+            
+            // Load predictions for specific country
+            fetch(`/api/objective4/predictions/?country=${encodeURIComponent(country)}&years=7`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.predictions.length > 0) {
+                        document.getElementById('predictionsSection').style.display = 'block';
+                        document.getElementById('predictionsCountryName').textContent = 
+                            `Predicted electricity access for ${country}`;
+                        
+                        const ctx = document.getElementById('predictionsChart').getContext('2d');
+                        
+                        if (predictionsChart) {
+                            predictionsChart.destroy();
+                        }
+                        
+                        const years = data.predictions.map(d => d.year);
+                        const predictions = data.predictions.map(d => d.predicted_access);
+                        
+                        predictionsChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Predicted Access (%)',
+                                    data: predictions,
+                                    borderColor: 'rgba(39, 174, 96, 1)',
+                                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    borderDash: [5, 5]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: {
+                                            display: true,
+                                            text: 'Access (%)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Also create the combined historical + future chart
+                        // Get historical data from the previous API call
+                        fetch(`/api/objective4/historical/?country=${encodeURIComponent(country)}`)
+                            .then(response => response.json())
+                            .then(historicalResponse => {
+                                if (historicalResponse.success) {
+                                    createCombinedAccessLevelsChart(country, historicalResponse.data, data.predictions);
+                                }
+                            })
+                            .catch(error => console.error('Error loading historical data for combined chart:', error));
+                    }
+                })
+                .catch(error => console.error('Error loading predictions:', error));
+        }
+        
+        function createCombinedAccessLevelsChart(country, historicalData, predictionsData) {
+            console.log('📊 Creating combined historical + future access levels chart...');
+            
+            // Show the combined section
+            document.getElementById('combinedAccessLevelsSection').style.display = 'block';
+            document.getElementById('combinedAccessCountryName').textContent = 
+                `Access level progression for ${country} (Historical + ML Predictions)`;
+            
+            const ctx = document.getElementById('combinedAccessChart').getContext('2d');
+            
+            if (window.combinedAccessChart) {
+                window.combinedAccessChart.destroy();
+            }
+            
+            // Prepare data for categorical chart
+            const allYears = [];
+            const accessLevels = [];
+            
+            // Add historical data
+            historicalData.forEach(point => {
+                allYears.push(point.Year);
+                const access = point['Access to electricity (% of population)'];
+                
+                // Categorize access levels
+                if (access <= 50) {
+                    accessLevels.push('Low Access');
+                } else if (access <= 90) {
+                    accessLevels.push('Medium Access');
+                } else {
+                    accessLevels.push('High Access');
+                }
+            });
+            
+            // Add future predictions
+            predictionsData.forEach(pred => {
+                allYears.push(pred.year);
+                accessLevels.push(pred.access_level);
+            });
+            
+            // Convert categorical data to numeric for Chart.js
+            const numericData = accessLevels.map(level => {
+                switch(level) {
+                    case 'Low Access': return 1;
+                    case 'Medium Access': return 2;
+                    case 'High Access': return 3;
+                    default: return 1;
+                }
+            });
+            
+            // Find the transition point between historical and future
+            const historicalLength = historicalData.length;
+            
+            window.combinedAccessChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allYears,
+                    datasets: [{
+                        label: country,
+                        data: numericData,
+                        borderColor: '#1f77b4',
+                        backgroundColor: 'rgba(31, 119, 180, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0, // Sharp angles like in the image
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: function(context) {
+                            // Different colors for historical vs future
+                            return context.dataIndex < historicalLength ? '#1f77b4' : '#ff7f0e';
+                        },
+                        pointBorderColor: function(context) {
+                            return context.dataIndex < historicalLength ? '#1f77b4' : '#ff7f0e';
+                        },
+                        segment: {
+                            borderDash: function(ctx) {
+                                // Dashed line for future predictions
+                                return ctx.p0DataIndex >= historicalLength - 1 ? [5, 5] : undefined;
+                            }
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 8,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Electricity Access Levels (Historical + Future)',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: '#2c3e50'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const index = tooltipItems[0].dataIndex;
+                                    const isHistorical = index < historicalLength;
+                                    return `Year: ${tooltipItems[0].label} ${isHistorical ? '(Historical)' : '(Predicted)'}`;
+                                },
+                                label: function(context) {
+                                    const level = accessLevels[context.dataIndex];
+                                    return `${context.dataset.label}: ${level}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0.5,
+                            max: 3.5,
+                            title: {
+                                display: true,
+                                text: 'Access Level',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    switch(value) {
+                                        case 1: return 'Low Access';
+                                        case 2: return 'Medium Access';
+                                        case 3: return 'High Access';
+                                        default: return '';
+                                    }
+                                },
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                color: function(context) {
+                                    // Horizontal dotted lines at each level
+                                    if ([1, 2, 3].includes(context.tick.value)) {
+                                        return 'rgba(0,0,0,0.3)';
+                                    }
+                                    return 'rgba(0,0,0,0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    return [1, 2, 3].includes(context.tick.value) ? 2 : 1;
+                                },
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: false
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+            
+            console.log('✅ Combined access levels chart created');
+        }
+        
+        function loadCountries() {
+            fetch('/api/objective4/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+        function loadCountryData() {
+            const country = document.getElementById('countrySelect').value;
+            
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            
+            // Load historical data
+            fetch(`/api/objective4/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        document.getElementById('historicalSection').style.display = 'block';
+                        document.getElementById('historicalCountryName').textContent = 
+                            `Electricity access trends for ${country}`;
+                        
+                        const ctx = document.getElementById('historicalChart').getContext('2d');
+                        
+                        if (historicalChart) {
+                            historicalChart.destroy();
+                        }
+                        
+                        const years = data.data.map(d => d.Year);
+                        const access = data.data.map(d => d['Access to electricity (% of population)']);
+                        
+                        historicalChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Electricity Access (%)',
+                                    data: access,
+                                    borderColor: 'rgba(102, 126, 234, 1)',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: {
+                                            display: true,
+                                            text: 'Access (%)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading historical data:', error));
+            
+            // Load predictions
+            fetch(`/api/objective4/predictions/?country=${encodeURIComponent(country)}&years=7`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.predictions.length > 0) {
+                        document.getElementById('predictionsSection').style.display = 'block';
+                        document.getElementById('predictionsCountryName').textContent = 
+                            `Predicted electricity access for ${country}`;
+                        
+                        const ctx = document.getElementById('predictionsChart').getContext('2d');
+                        
+                        if (predictionsChart) {
+                            predictionsChart.destroy();
+                        }
+                        
+                        const years = data.predictions.map(d => d.year);
+                        const predictions = data.predictions.map(d => d.predicted_access);
+                        
+                        predictionsChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Predicted Access (%)',
+                                    data: predictions,
+                                    borderColor: 'rgba(39, 174, 96, 1)',
+                                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    borderDash: [5, 5]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: {
+                                            display: true,
+                                            text: 'Access (%)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading predictions:', error));
+        }
+    </script>
+</body>
+</html>

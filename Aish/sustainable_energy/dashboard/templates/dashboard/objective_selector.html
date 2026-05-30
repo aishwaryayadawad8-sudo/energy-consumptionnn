@@ -1,0 +1,2045 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy & emissions projections 2050 - EnerOutlook</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: white; /* Changed from #f8fafc to white */
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation Icons */
+        .nav-icons {
+            background: white;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            padding: 0 30px;
+        }
+        
+        .nav-icon-item {
+            flex: 1;
+            max-width: 200px;
+            text-align: center;
+            padding: 25px 15px;
+            text-decoration: none;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+        
+        .nav-icon-item:hover {
+            color: #f97316;
+            background: #fef3e2;
+            text-decoration: none;
+            border-bottom-color: #f97316;
+        }
+        
+        .nav-icon-item.active {
+            color: #f97316;
+            background: #fef3e2;
+            border-bottom-color: #f97316;
+        }
+        
+        .nav-icon {
+            width: 50px;
+            height: 50px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.4rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-icon-item:hover .nav-icon,
+        .nav-icon-item.active .nav-icon {
+            background: #fed7aa;
+            color: #f97316;
+            transform: scale(1.1);
+        }
+        
+        .nav-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Hero Section with Background */
+        .hero-section {
+            background: 
+                radial-gradient(ellipse at center, #0a1628 0%, #050b14 50%, #000000 100%);
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><filter id="electricGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:%23000000;stop-opacity:0"/><stop offset="20%" style="stop-color:%2300ffff;stop-opacity:0.3"/><stop offset="40%" style="stop-color:%23ffffff;stop-opacity:1"/><stop offset="60%" style="stop-color:%2300d4ff;stop-opacity:0.8"/><stop offset="80%" style="stop-color:%2300ffff;stop-opacity:0.3"/><stop offset="100%" style="stop-color:%23000000;stop-opacity:0"/></linearGradient></defs><g stroke="%23334455" stroke-width="2" fill="none" opacity="0.6"><path d="M0,100 L200,100 L200,150 L400,150 L400,100 L600,100 L600,200 L800,200 L800,150 L1000,150 L1000,100 L1200,100"/><path d="M0,200 L150,200 L150,250 L350,250 L350,200 L550,200 L550,300 L750,300 L750,250 L950,250 L950,200 L1200,200"/><path d="M0,300 L100,300 L100,350 L300,350 L300,300 L500,300 L500,250 L700,250 L700,300 L900,300 L900,350 L1200,350"/></g><g fill="%2300ffff" opacity="0.8" filter="url(%23electricGlow)"><circle cx="200" cy="100" r="4"/><circle cx="400" cy="150" r="4"/><circle cx="600" cy="100" r="4"/><circle cx="800" cy="200" r="4"/><circle cx="1000" cy="150" r="4"/><circle cx="150" cy="200" r="4"/><circle cx="350" cy="250" r="4"/><circle cx="550" cy="200" r="4"/><circle cx="750" cy="300" r="4"/><circle cx="950" cy="250" r="4"/><circle cx="100" cy="300" r="4"/><circle cx="300" cy="350" r="4"/><circle cx="500" cy="300" r="4"/><circle cx="700" cy="250" r="4"/><circle cx="900" cy="300" r="4"/></g></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Flowing electricity animation layer 1 */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><filter id="flowGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="electricFlow1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:%23000000;stop-opacity:0"/><stop offset="30%" style="stop-color:%2300ffff;stop-opacity:0.5"/><stop offset="50%" style="stop-color:%23ffffff;stop-opacity:1"/><stop offset="70%" style="stop-color:%2300d4ff;stop-opacity:0.5"/><stop offset="100%" style="stop-color:%23000000;stop-opacity:0"/></linearGradient></defs><g stroke="url(%23electricFlow1)" stroke-width="6" fill="none" opacity="1" filter="url(%23flowGlow)"><path d="M0,100 L200,100 L200,150 L400,150 L400,100 L600,100 L600,200 L800,200 L800,150 L1000,150 L1000,100 L1200,100"/></g></svg>');
+            background-size: 200% 100%;
+            animation: electricFlow1 16s linear infinite; /* Slowed down from 8s */
+        }
+        
+        /* Flowing electricity animation layer 2 */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><filter id="flowGlow2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="electricFlow2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:%23000000;stop-opacity:0"/><stop offset="25%" style="stop-color:%2300d4ff;stop-opacity:0.4"/><stop offset="45%" style="stop-color:%2300ffff;stop-opacity:0.8"/><stop offset="55%" style="stop-color:%23ffffff;stop-opacity:1"/><stop offset="75%" style="stop-color:%2300ffff;stop-opacity:0.4"/><stop offset="100%" style="stop-color:%23000000;stop-opacity:0"/></linearGradient></defs><g stroke="url(%23electricFlow2)" stroke-width="4" fill="none" opacity="0.8" filter="url(%23flowGlow2)"><path d="M0,200 L150,200 L150,250 L350,250 L350,200 L550,200 L550,300 L750,300 L750,250 L950,250 L950,200 L1200,200"/><path d="M0,300 L100,300 L100,350 L300,350 L300,300 L500,300 L500,250 L700,250 L700,300 L900,300 L900,350 L1200,350"/></g></svg>');
+            background-size: 200% 100%;
+            animation: electricFlow2 20s linear infinite; /* Slowed down from 10s */
+        }
+        
+        @keyframes electricFlow1 {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        @keyframes electricFlow2 {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Additional flowing particles */
+        .hero-section .flowing-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(3px 3px at 0% 25%, #00ffff, transparent),
+                radial-gradient(2px 2px at 0% 50%, #ffffff, transparent),
+                radial-gradient(2px 2px at 0% 75%, #00d4ff, transparent);
+            background-size: 100px 400px;
+            animation: particleFlow 12s linear infinite; /* Slowed down from 6s */
+            opacity: 0.7;
+        }
+        
+        @keyframes particleFlow {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(1300px); }
+        }
+        
+        /* Electrical pulse effect */
+        .hero-bg {
+            animation: electricPulse 10s ease-in-out infinite alternate; /* Slowed down from 5s */
+        }
+        
+        @keyframes electricPulse {
+            0% { opacity: 0.8; filter: brightness(1); }
+            100% { opacity: 1; filter: brightness(1.3); }
+        }            margin: 0 auto;
+            padding: 60px 30px;
+            background: white;
+        }
+        
+        /* ML Model Comparison Section */
+        .explore-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .explore-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .explore-subtitle {
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .explore-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.3);
+        }
+        
+        .explore-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(249, 115, 22, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+        
+        /* More Projections Section */
+        .more-projections {
+            background: white; /* Changed from #f8fafc to white */
+            border-radius: 12px;
+            padding: 40px;
+            margin-top: 40px;
+            border: 1px solid #e5e7eb; /* Add border for definition */
+        }
+        
+        .more-projections h3 {
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .more-projections p {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        /* Objectives Section (Hidden by default) */
+        .objectives-section {
+            display: none;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple gradient background */
+        }
+        
+        .objectives-section.active {
+            display: block;
+        }
+
+        .objectives-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 60px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7); /* Stronger text shadow for better readability */
+            background: rgba(0,0,0,0.3); /* Add semi-transparent background */
+            padding: 20px 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px); /* Add blur effect for better contrast */
+            border: 2px solid rgba(255,255,255,0.2); /* Subtle border */
+        }
+        
+        .objectives-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 columns for 4 objectives per row */
+            grid-template-rows: auto auto; /* 2 rows */
+            gap: 20px; /* Gap between objectives */
+            margin-top: 20px;
+        }
+        
+        .objective-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Objective info section (full width) */
+        .objective-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Ensure content appears above watermark overlay */
+        .objective-card:nth-child(4) .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Ensure content appears above watermark overlay */
+        .objective-card:nth-child(5) .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Ensure content appears above overlay */
+        .objective-card:nth-child(8) .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Ensure content appears above overlay */
+        .objective-card:nth-child(7) .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Ensure content appears above watermark overlay */
+        .objective-card:nth-child(6) .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Ensure content appears above overlay with better contrast */
+        .objective-card:first-child .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Apply text visibility styling to all objectives */
+        .objective-card .objective-title {
+            color: #1f2937;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 1), 
+                         -1px -1px 2px rgba(255, 255, 255, 1),
+                         1px -1px 2px rgba(255, 255, 255, 1),
+                         -1px 1px 2px rgba(255, 255, 255, 1);
+        }
+        
+        .objective-card .objective-description {
+            color: #374151;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 1), 
+                         -1px -1px 2px rgba(255, 255, 255, 1),
+                         1px -1px 2px rgba(255, 255, 255, 1),
+                         -1px 1px 2px rgba(255, 255, 255, 1);
+        }
+        
+        .objective-card .objective-number {
+            color: #f97316;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 1), 
+                         -1px -1px 2px rgba(255, 255, 255, 1),
+                         1px -1px 2px rgba(255, 255, 255, 1),
+                         -1px 1px 2px rgba(255, 255, 255, 1);
+        }
+
+        .objective-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .objective-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .objective-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .objective-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .objective-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .objective-number {
+            background: #fef3e2;
+            color: #f97316;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+        
+        .objective-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        
+        .objective-description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+        
+        .objective-btn {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .objective-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-icon-item {
+                min-width: 120px;
+                padding: 20px 10px;
+            }
+            
+            .main-content {
+                padding: 40px 20px;
+            }
+            
+            .objectives-grid {
+                grid-template-columns: 1fr 1fr; /* 2 columns on mobile */
+                grid-template-rows: auto auto auto auto; /* 4 rows on mobile */
+                gap: 15px;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                padding: 0 20px;
+            }
+            
+            .project-title {
+                position: static;
+                margin-top: 10px;
+            }
+            
+            .objective-card {
+                min-height: 250px;
+            }
+        }
+
+        /* Embedded Dashboard Styles */
+        .embedded-dashboard {
+            margin-top: 0;
+        }
+        
+        .embedded-dashboard .dashboard-container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .embedded-dashboard .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header-section h1 {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .header-section p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            border-radius: 50px;
+            padding: 15px 25px;
+            border: 2px solid #e0e0e0;
+            font-size: 1.1rem;
+        }
+        
+        .search-box input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .search-box button {
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: bold;
+        }
+        
+        #map {
+            height: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .result-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .alert-box {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .alert-box.critical {
+            background: #ffe6e6;
+            border-left: 5px solid var(--danger-color);
+        }
+        
+        .alert-box.warning {
+            background: #fff4e6;
+            border-left: 5px solid var(--warning-color);
+        }
+        
+        .alert-box.good {
+            background: #e6ffe6;
+            border-left: 5px solid var(--success-color);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-card h4 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .metric-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .metric-card .unit {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .not-found-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff3cd;
+            border-radius: 15px;
+            border: 2px dashed #ffc107;
+        }
+        
+        .not-found-message i {
+            font-size: 4rem;
+            color: #ffc107;
+            margin-bottom: 20px;
+        }
+        
+        .not-found-message h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .objectives-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .objective-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .objective-item i {
+            color: var(--secondary-color);
+            margin-right: 10px;
+        }
+
+        /* Smooth transitions */
+        .dashboard-section {
+            transition: all 0.3s ease;
+        }
+        
+        .explore-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .explore-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Button styles */
+        .explore-btn {
+            cursor: pointer;
+            border: none;
+        }
+        
+        .explore-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Ensure map container has proper size */
+        #map {
+            width: 100%;
+            height: 500px;
+            min-height: 500px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Ensure map container is properly sized */
+        #dashboardSection #map {
+            width: 100% !important;
+            height: 500px !important;
+            min-height: 500px !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+            .project-description p {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Top Project Title Banner */
+        .top-project-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .project-banner-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        
+        .top-project-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+        }
+        
+        /* Responsive design for top banner */
+        @media (max-width: 1200px) {
+            .top-project-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-project-banner {
+                padding: 12px 0;
+            }
+            
+            .project-banner-content {
+                padding: 0 20px;
+            }
+            
+            .top-project-title {
+                font-size: 1.2rem;
+                letter-spacing: 0.3px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .top-project-banner {
+                padding: 10px 0;
+            }
+            
+            .top-project-title {
+                font-size: 1rem;
+                line-height: 1.4;
+            }
+        }
+        /* BUTTON CLICKABILITY FIX */
+        .objective-btn {
+            position: relative !important;
+            z-index: 1000 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+        
+        .objective-info {
+            position: relative !important;
+            z-index: 999 !important;
+        }
+        
+        .objective-card .objective-info > * {
+            position: relative !important;
+            z-index: 1001 !important;
+        }
+
+        /* Objective Background Images - Using specific selectors for 4-column layout */
+        
+        /* Objective 1: Energy Consumption Prediction */
+        .objective-card[data-objective="1"] .objective-info {
+            background-image: url('/static/images/energy-consumption-prediction.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="1"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        /* Objective 2: CO₂ Emission Forecasting */
+        .objective-card[data-objective="2"] .objective-info {
+            background-image: url('/static/images/co2-emission.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="2"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        /* Objective 3: Energy Access Classification */
+        .objective-card[data-objective="3"] .objective-info {
+            background-image: url('/static/images/energy-access-classification.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="3"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        
+        /* Objective 4: SDG-7 Progress Monitoring */
+        .objective-card[data-objective="4"] .objective-info {
+            background-image: url('/static/images/sdg7-progress-monitoring.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="4"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+                /* Objective 5: Energy Equity Analysis */
+        .objective-card[data-objective="5"] .objective-info {
+            background-image: url('/static/images/energy-equity-analysis.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="5"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        /* Objective 6: Efficiency Optimization Identification */
+        .objective-card[data-objective="6"] .objective-info {
+            background-image: url('/static/images/efficiency-optimization-identification.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="6"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        /* Objective 7: Renewable Energy Potential Assessment */
+        .objective-card[data-objective="7"] .objective-info {
+            background-image: url('/static/images/renewable-energy-potential-assessment.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="7"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        /* Objective 8: Sustainable Investment Strategy Support */
+        .objective-card[data-objective="8"] .objective-info {
+            background-image: url('/static/images/sustainable-investment-strategy-support.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .objective-card[data-objective="8"] .objective-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        /* Ensure content appears above overlay with better contrast */
+        .objective-card .objective-info > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Apply text visibility styling to all objectives */
+        .objective-card .objective-title {
+            color: #1f2937;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 1), 
+                         -1px -1px 2px rgba(255, 255, 255, 1),
+                         1px -1px 2px rgba(255, 255, 255, 1),
+                         -1px 1px 2px rgba(255, 255, 255, 1);
+        }
+        
+        .objective-card .objective-description {
+            color: #374151;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 1), 
+                         -1px -1px 2px rgba(255, 255, 255, 1),
+                         1px -1px 2px rgba(255, 255, 255, 1),
+                         -1px 1px 2px rgba(255, 255, 255, 1);
+        }
+        
+        .objective-card .objective-number {
+            color: #f97316;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 1), 
+                         -1px -1px 2px rgba(255, 255, 255, 1),
+                         1px -1px 2px rgba(255, 255, 255, 1),
+                         -1px 1px 2px rgba(255, 255, 255, 1);
+        }
+        
+        
+        /* Project Background Image */
+        body {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%), 
+                        url('/static/images/project-background.jpg') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Project Title Banner -->
+    <div class="top-project-banner">
+        <div class="project-banner-content">
+            <h1 class="top-project-title">TOWARDS AFFORDABLE AND CLEAN ENERGY: A PREDICTIVE AND STRATEGIC FRAMEWORK FOR SDG 7</h1>
+        </div>
+
+    <!-- Navigation Icons -->
+    <nav class="nav-icons">
+        <div class="nav-container">
+            <a href="{% url 'total_energy_dashboard' %}" class="nav-icon-item">
+                <div class="nav-icon"><i class="fas fa-bolt"></i></div>
+                <div class="nav-label">Total Energy</div>
+            </a>
+            <a href="/explore/" class="nav-icon-item">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                <div class="nav-label">Explore Dashboard</div>
+            </a>
+            <a href="{% url 'electricity_dashboard' %}" class="nav-icon-item">
+                <div class="nav-icon"><i class="fas fa-plug"></i></div>
+                <div class="nav-label">Electricity</div>
+            </a>
+            <a href="{% url 'objective3_dashboard' %}" class="nav-icon-item">
+                <div class="nav-icon"><i class="fas fa-leaf"></i></div>
+                <div class="nav-label">Renewables</div>
+            </a>
+            <a href="{% url 'co2_emissions_dashboard' %}" class="nav-icon-item">
+                <div class="nav-icon"><i class="fas fa-smog"></i></div>
+                <div class="nav-label">CO Emissions</div>
+            </a>
+            <a href="#" class="nav-icon-item" id="country-forecasts-tab">
+                <div class="nav-icon"><i class="fas fa-globe"></i></div>
+                <div class="nav-label">Country Forecasts</div>
+            </a>
+            <a href="/comprehensive-comparison/" class="nav-icon-item">
+                <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="nav-label">More Projections</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-bg"></div>
+        <div class="flowing-particles"></div>
+    </section>
+
+    <!-- Main Content -->
+            <main class="main-content" id="main-content">
+
+        <!-- More Projections Info -->
+        <section class="more-projections">
+            <h3><i class="fas fa-chart-line"></i> More Projections</h3>
+            <p>
+                The series contained in this interface are a short excerpt of the data available in EnerData's EnerFuture service. 
+                The complete service provides:
+            </p>
+            <ul>
+                <li><strong>Many other series</strong> including end-user prices, electricity generation and capacities by energy source, etc.</li>
+                <li><strong>Extended</strong> global coverage including 186 countries and regional aggregates.</li>
+                <li><strong>Additional scenarios:</strong> whereas the data in EnerOutlook corresponds to the EnerBlue scenario (NDC achievement), 
+                two other scenarios are provided in EnerFuture: EnerBase (current policies) and EnerGreen (2Â°C scenario).</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Objectives Section (Hidden by default) -->
+    <section class="objectives-section" id="objectives-section">
+        <div class="objectives-container">
+            <h2 class="section-title">Country Energy Forecasts - All Objectives</h2>
+            
+            <div class="objectives-grid">
+                <!-- Row 1: Objectives 1, 2, 3, 4 -->
+                
+                <!-- Objective 1: Energy Consumption Prediction -->
+                <div class="objective-card" data-objective="1">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="objective-number">01</div>
+                        </div>
+                        <h3 class="objective-title">Energy Consumption Prediction</h3>
+                        <p class="objective-description">
+                            To analyze historical global energy consumption data and develop machine learning models to predict future electricity usage trends across different countries.
+                        </p>
+                        <a href="{% url 'objective1_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Objective 2: CO₂ Emission Forecasting -->
+                <div class="objective-card" data-objective="2">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-smog"></i>
+                            </div>
+                            <div class="objective-number">02</div>
+                        </div>
+                        <h3 class="objective-title">CO₂ Emission Forecasting</h3>
+                        <p class="objective-description">
+                            To study past carbon emission patterns and forecast future CO₂ emission levels in order to assess environmental impact and sustainability progress.
+                        </p>
+                        <a href="{% url 'objective2_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Objective 3: Energy Access Classification -->
+                <div class="objective-card" data-objective="3">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="objective-number">03</div>
+                        </div>
+                        <h3 class="objective-title">Energy Access Classification</h3>
+                        <p class="objective-description">
+                            To classify countries based on electricity access levels using machine learning techniques, identifying regions with inadequate or improving energy availability.
+                        </p>
+                        <a href="{% url 'objective3_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Objective 4: SDG-7 Progress Monitoring -->
+                <div class="objective-card" data-objective="4">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-target"></i>
+                            </div>
+                            <div class="objective-number">04</div>
+                        </div>
+                        <h3 class="objective-title">SDG-7 Progress Monitoring</h3>
+                        <p class="objective-description">
+                            To monitor and visualize country-wise progress toward Sustainable Development Goal 7 using historical indicators and trend analysis.
+                        </p>
+                        <a href="{% url 'co2_emissions_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Row 2: Objectives 5, 6, 7, 8 -->
+                
+                <!-- Objective 5: Energy Equity Analysis -->
+                <div class="objective-card" data-objective="5">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="objective-number">05</div>
+                        </div>
+                        <h3 class="objective-title">Energy Equity Analysis</h3>
+                        <p class="objective-description">
+                            To evaluate disparities in energy access and consumption among developed, developing, and underdeveloped countries.
+                        </p>
+                        <a href="{% url 'objective5_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Objective 6: Efficiency Optimization Identification -->
+                <div class="objective-card" data-objective="6">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="objective-number">06</div>
+                        </div>
+                        <h3 class="objective-title">Efficiency Optimization Identification</h3>
+                        <p class="objective-description">
+                            To identify high-consumption regions and inefficiencies in energy usage that can be optimized for better sustainability outcomes.
+                        </p>
+                        <a href="{% url 'objective6_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Objective 7: Renewable Energy Potential Assessment -->
+                <div class="objective-card" data-objective="7">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="objective-number">07</div>
+                        </div>
+                        <h3 class="objective-title">Renewable Energy Potential Assessment</h3>
+                        <p class="objective-description">
+                            To assess renewable energy growth trends and predict future potential for clean energy adoption across countries.
+                        </p>
+                        <a href="{% url 'objective7_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Objective 8: Sustainable Investment Strategy Support -->
+                <div class="objective-card" data-objective="8">
+                    <div class="objective-info">
+                        <div class="objective-header">
+                            <div class="objective-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="objective-number">08</div>
+                        </div>
+                        <h3 class="objective-title">Sustainable Investment Strategy Support</h3>
+                        <p class="objective-description">
+                            To provide data-driven insights and forecasts that can support strategic investment decisions in sustainable and renewable energy sectors.
+                        </p>
+                        <a href="{% url 'objective8_dashboard' %}" class="objective-btn" style="margin-top: auto;">
+                            View Analysis
+                        </a>
+                    </div>
+                </div>
+            </div></div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle Country Forecasts tab click
+        document.getElementById('country-forecasts-tab').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Toggle active state
+            document.querySelectorAll('.nav-icon-item').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide sections
+            const mainContent = document.getElementById('main-content');
+            const objectivesSection = document.getElementById('objectives-section');
+            
+            if (objectivesSection.classList.contains('active')) {
+                // Hide objectives, show main content
+                objectivesSection.classList.remove('active');
+                mainContent.style.display = 'block';
+                this.classList.remove('active');
+            } else {
+                // Show objectives, hide main content
+                objectivesSection.classList.add('active');
+                mainContent.style.display = 'none';
+            }
+        });
+
+        // Handle other nav tabs
+        document.querySelectorAll('.nav-icon-item:not(#country-forecasts-tab)').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Reset objectives section
+                document.getElementById('objectives-section').classList.remove('active');
+                document.getElementById('main-content').style.display = 'block';
+                document.querySelectorAll('.nav-icon-item').forEach(t => t.classList.remove('active'));
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+
+          // Store the highlighted country marker
+        
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Â© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            loadMapData();
+        }
+        
+        // Load map data
+        function loadMapData() {
+            fetch('/api/map-data/')
+                .then(response => response.json())
+                .then(data => {
+                    data.map_data.forEach(country => {
+                        const color = country.electricity_access >= 80 ? '#27ae60' : 
+                                     country.electricity_access >= 50 ? '#f39c12' : '#e74c3c';
+                        
+                        L.circleMarker([country.lat, country.lon], {
+                            radius: 5,
+                            fillColor: color,
+                            color: '#fff',
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        }).bindPopup(`
+                            <strong>${country.country}</strong><br>
+                            Electricity Access: ${country.electricity_access.toFixed(1)}%<br>
+                            Renewable Share: ${country.renewable_share.toFixed(1)}%<br>
+                            CO₂: ${country.co2_emissions.toFixed(0)} kt
+                        `).addTo(map);
+                    });
+                });
+        }
+
+        // Highlight selected country on map
+        function highlightCountryOnMap(countryName, lat, lon, electricityAccess) {
+            // Remove previous highlight if exists
+            if (highlightMarker) {
+                map.removeLayer(highlightMarker);
+                // Also remove boundary layer if exists
+                if (highlightMarker.boundaryLayer) {
+                    map.removeLayer(highlightMarker.boundaryLayer);
+                }
+            }
+            
+            // Create custom pin icon
+            const pinIcon = L.divIcon({
+                className: 'custom-pin-marker',
+                html: `
+                    <div style="position: relative;">
+                        <svg width="50" height="70" viewBox="0 0 50 70" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Pin shadow -->
+                            <ellipse cx="25" cy="65" rx="8" ry="3" fill="rgba(0,0,0,0.3)"/>
+                            <!-- Pin body -->
+                            <path d="M25 0 C15 0 7 8 7 18 C7 28 25 50 25 50 C25 50 43 28 43 18 C43 8 35 0 25 0 Z" 
+                                  fill="#98BF64" stroke="#2E7D32" stroke-width="3"/>
+                            <!-- Pin center circle -->
+                            <circle cx="25" cy="18" r="8" fill="#FFFFFF"/>
+                            <!-- Pin inner dot -->
+                            <circle cx="25" cy="18" r="4" fill="#98BF64"/>
+                        </svg>
+                        <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); 
+                                    background: #98BF64; color: white; padding: 5px 12px; border-radius: 5px; 
+                                    border: 2px solid #2E7D32; white-space: nowrap; font-weight: bold; 
+                                    box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 14px;">
+                            ${countryName}
+                        </div>
+                `,
+                iconSize: [50, 70],
+                iconAnchor: [25, 50],
+                popupAnchor: [0, -50]
+            });
+            
+            // Create marker with pin icon
+            highlightMarker = L.marker([lat, lon], {
+                icon: pinIcon,
+                zIndexOffset: 1000  // Ensure it's on top
+            }).addTo(map);
+            
+            // Add popup with details
+            highlightMarker.bindPopup(`
+                <div style="text-align: center; padding: 10px;">
+                    <strong style="font-size: 18px; color: #98BF64;">ðŸ“ ${countryName}</strong><br>
+                    <hr style="margin: 8px 0; border-color: #98BF64;">
+                    <span style="font-size: 16px;">âš¡ Electricity Access: <strong>${electricityAccess.toFixed(1)}%</strong></span>
+                </div>
+            `).openPopup();
+            
+            // Zoom to the country
+            map.setView([lat, lon], 6, {
+                animate: true,
+                duration: 1
+            });
+            
+            // Try to highlight country boundary using Nominatim API
+            fetch(`https://nominatim.openstreetmap.org/search?country=${encodeURIComponent(countryName)}&polygon_geojson=1&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0 && data[0].geojson) {
+                        // Add country boundary highlight
+                        const boundaryLayer = L.geoJSON(data[0].geojson, {
+                            style: {
+                                color: '#98BF64',      // Pink border
+                                weight: 4,
+                                opacity: 0.8,
+                                fillColor: '#98BF64',  // Pink fill
+                                fillOpacity: 0.2       // Semi-transparent
+                            }
+                        }).addTo(map);
+                        
+                        // Store boundary layer to remove later
+                        if (!highlightMarker.boundaryLayer) {
+                            highlightMarker.boundaryLayer = boundaryLayer;
+                        }
+                        
+                        // Fit map to country bounds
+                        map.fitBounds(boundaryLayer.getBounds(), {
+                            padding: [50, 50],
+                            animate: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not load country boundary:', error);
+                    // Fallback to just pin marker if boundary fails
+                });
+        }
+                // Load countries list
+        function loadCountries() {
+            fetch('/api/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.countries && Array.isArray(data.countries)) {
+                        const datalist = document.getElementById('countriesList');
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            datalist.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading countries:', error);
+                });
+        }
+        
+        // Search country
+        function searchCountry() {
+            const country = document.getElementById('countrySearch').value.trim();
+            if (!country) {
+                alert('Please enter a country name');
+                return;
+            }
+            
+            const resultsSection = document.getElementById('resultsSection');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const notFoundMessage = document.getElementById('notFoundMessage');
+            const countryResults = document.getElementById('countryResults');
+            
+            resultsSection.style.display = 'block';
+            loadingSpinner.style.display = 'block';
+            notFoundMessage.style.display = 'none';
+            countryResults.style.display = 'none';
+            
+            fetch(`/api/search/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    
+                    if (!data.found) {
+                        notFoundMessage.style.display = 'block';
+                        document.getElementById('notFoundText').textContent = data.message;
+                        return;
+                    }
+                    
+                    displayCountryData(data);
+                    loadPredictions(country);
+                    
+                    // Highlight country on map if coordinates are available
+                    if (data.latitude && data.longitude) {
+                        highlightCountryOnMap(data.country, data.latitude, data.longitude, data.electricity_access || 0);
+                    }
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    notFoundMessage.style.display = 'block';
+                    document.getElementById('notFoundText').textContent = 'Error loading data: ' + error.message;
+                });
+        }
+        
+        // Display country data
+        function displayCountryData(data) {
+            document.getElementById('countryResults').style.display = 'block';
+            document.getElementById('countryName').innerHTML = 
+                `<i class="fas fa-flag"></i> ${data.country} - Energy Profile (${data.latest_year})`;
+            
+            // Update metrics
+            document.getElementById('electricityAccess').textContent = 
+                data.electricity_access ? data.electricity_access.toFixed(1) : 'N/A';
+            document.getElementById('cleanCooking').textContent = 
+                data.clean_cooking_access ? data.clean_cooking_access.toFixed(1) : 'N/A';
+            
+            // Update status alert
+            const statusAlert = document.getElementById('statusAlert');
+            const status = data.status;
+            statusAlert.className = 'alert-box ' + status.status.toLowerCase();
+            statusAlert.innerHTML = `
+                <h4><i class="fas fa-info-circle"></i> Status: ${status.status}</h4>
+                ${status.alerts.map(alert => `<p>${alert}</p>`).join('')}
+            `;
+            
+            // Create charts
+            createCharts(data);
+        }
+        
+        // Create charts
+        function createCharts(data) {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+            
+            const years = data.historical_data.map(d => d.Year);
+            
+            // Electricity Access Chart
+            charts.electricity = new Chart(document.getElementById('electricityChart'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Electricity Access (%)',
+                        data: data.historical_data.map(d => d['Access to electricity (% of population)']),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true } }
+                }
+            });
+            
+            // Renewable Energy Chart
+            charts.renewable = new Chart(document.getElementById('renewableChart'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Renewable Share (%)',
+                        data: data.historical_data.map(d => d['Renewable energy share in the total final energy consumption (%)']),
+                        borderColor: '#4facfe',
+                        backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true } }
+                }
+            });
+            
+            // CO2 Chart
+            charts.co2 = new Chart(document.getElementById('co2Chart'), {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'CO₂ Emissions (kt)',
+                        data: data.historical_data.map(d => d.Value_co2_emissions_kt_by_country),
+                        backgroundColor: 'rgba(254, 97, 108, 0.7)',
+                        borderColor: '#fe616c',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true } }
+                }
+            });
+            
+            // Energy Mix Chart
+            const latestData = data.historical_data[data.historical_data.length - 1];
+            charts.energyMix = new Chart(document.getElementById('energyMixChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fossil Fuels', 'Renewables', 'Nuclear'],
+                    datasets: [{
+                        data: [
+                            latestData['Electricity from fossil fuels (TWh)'] || 0,
+                            latestData['Electricity from renewables (TWh)'] || 0,
+                            latestData['Electricity from nuclear (TWh)'] || 0
+                        ],
+                        backgroundColor: ['#e74c3c', '#27ae60', '#3498db']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        } 
+                    }
+                }
+            });
+        }
+        
+        // Load predictions
+        function loadPredictions(country) {
+            fetch(`/api/predict/?country=${encodeURIComponent(country)}&years=5`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.found && data.predictions) {
+                        const years = data.predictions.map(p => p.year);
+                        const values = data.predictions.map(p => p.predicted_access);
+                        
+                        charts.prediction = new Chart(document.getElementById('predictionChart'), {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Predicted Electricity Access (%)',
+                                    data: values,
+                                    borderColor: '#f093fb',
+                                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 3
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { 
+                                    legend: { display: true },
+                                    title: {
+                                        display: true,
+                                        text: 'ML-Based Future Predictions'
+                                    }
+                                }
+                            }
+                        });
+                        
+                        document.getElementById('modelInfo').textContent = 
+                            `Predictions generated using ${data.model_used} model`;
+                    }
+                });
+        }
+        
+        // Enter key support
+        document.getElementById('countrySearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCountry();
+            }
+        });
+        
+        // Send Email Alerts Function
+        async function sendEmailAlerts() {
+            const btn = document.getElementById('sendAlertsBtn');
+            const resultsDiv = document.getElementById('emailAlertResults');
+            
+            if (!confirm('Are you sure you want to send email alerts to all countries? This will analyze electricity access and send personalized emails.')) {
+                return;
+            }
+            
+            // Disable button and show loading
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending alerts...';
+            resultsDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Analyzing countries and sending emails...</div>';
+            
+            try {
+                const response = await fetch('/api/send-email-alerts/');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success popup
+                    let alertsHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                    alertsHtml += '<h4 class="alert-heading"><i class="fas fa-check-circle"></i> Email Alerts Sent Successfully!</h4>';
+                    alertsHtml += `<p><strong>Total alerts sent:</strong> ${data.total_alerts}</p>`;
+                    alertsHtml += '<hr>';
+                    alertsHtml += '<h5>Countries that received alerts:</h5>';
+                    alertsHtml += '<div class="row">';
+                    
+                    // Group by status
+                    const critical = data.alerts_sent.filter(a => a.status === 'critical');
+                    const needsImprovement = data.alerts_sent.filter(a => a.status === 'needs_improvement');
+                    const excellent = data.alerts_sent.filter(a => a.status === 'excellent');
+                    
+                    if (critical.length > 0) {
+                        alertsHtml += '<div class="col-md-4"><div class="card border-danger mb-3"><div class="card-header bg-danger text-white"><i class="fas fa-exclamation-triangle"></i> Critical</div><div class="card-body"><ul class="list-unstyled">';
+                        critical.forEach(alert => {
+                            alertsHtml += `<li>ðŸš¨ <strong>${alert.country}</strong><br><small>${alert.access.toFixed(1)}% access â†’ ${alert.email}</small></li><hr>`;
+                        });
+                        alertsHtml += '</ul></div>';
+                    }
+                    
+                    if (needsImprovement.length > 0) {
+                        alertsHtml += '<div class="col-md-4"><div class="card border-warning mb-3"><div class="card-header bg-warning text-dark"><i class="fas fa-exclamation-circle"></i> Needs Improvement</div><div class="card-body"><ul class="list-unstyled">';
+                        needsImprovement.forEach(alert => {
+                            alertsHtml += `<li>âš ï¸ <strong>${alert.country}</strong><br><small>${alert.access.toFixed(1)}% access â†’ ${alert.email}</small></li><hr>`;
+                        });
+                        alertsHtml += '</ul></div>';
+                    }
+                    
+                    if (excellent.length > 0) {
+                        alertsHtml += '<div class="col-md-4"><div class="card border-success mb-3"><div class="card-header bg-success text-white"><i class="fas fa-star"></i> Excellent</div><div class="card-body"><ul class="list-unstyled">';
+                        excellent.forEach(alert => {
+                            alertsHtml += `<li>ðŸŽ‰ <strong>${alert.country}</strong><br><small>${alert.access.toFixed(1)}% access â†’ ${alert.email}</small></li><hr>`;
+                        });
+                        alertsHtml += '</ul></div>';
+                    }
+                    
+                    alertsHtml += '</div>';
+                    alertsHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                    alertsHtml += '</div>';
+                    
+                    resultsDiv.innerHTML = alertsHtml;
+                    
+                    // Show browser notification if supported
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification("Email Alerts Sent!", {
+                            body: `Successfully sent ${data.total_alerts} email alerts to countries`,
+                            icon: "/static/icon.png"
+                        });
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-triangle"></i> <strong>Error:</strong> ${data.error || data.message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = `<div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-triangle"></i> <strong>Error:</strong> ${error.message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Email Alerts to All Countries';
+            }
+        }
+        
+        // Initialize
+        window.onload = function() {
+            initMap();
+            loadCountries();
+            
+            // Request notification permission
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+        };
+    </script>
+</body>
+</html>
+
+    <script ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Â© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            loadMapData();
+        }
+        
+        // Load map data
+        function loadMapData() {
+            fetch('/api/map-data/')
+                .then(response => response.json())
+                .then(data => {
+                    data.map_data.forEach(country => {
+                        const color = country.electricity_access >= 80 ? '#27ae60' : 
+                                     country.electricity_access >= 50 ? '#f39c12' : '#e74c3c';
+                        
+                        L.circleMarker([country.lat, country.lon], {
+                            radius: 5,
+                            fillColor: color,
+                            color: '#fff',
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        }).bindPopup(`
+                            <strong>${country.country}</strong><br>
+                            Electricity Access: ${country.electricity_access.toFixed(1)}%<br>
+                            Renewable Share: ${country.renewable_share.toFixed(1)}%<br>
+                            CO₂: ${country.co2_emissions.toFixed(0)} kt
+                        `).addTo(map);
+                    });
+                });
+        }
+        
+        // Load countries list
+        function loadCountries() {
+            fetch('/api/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.countries && Array.isArray(data.countries)) {
+                        const datalist = document.getElementById('countriesList');
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            datalist.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading countries:', error);
+                });
+        }
+        
+        // Search country
+        function searchCountry() {
+            const country = document.getElementById('countrySearch').value.trim();
+            if (!country) {
+                alert('Please enter a country name');
+                return;
+            }
+            
+            const resultsSection = document.getElementById('resultsSection');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const notFoundMessage = document.getElementById('notFoundMessage');
+            const countryResults = document.getElementById('countryResults');
+            
+            resultsSection.style.display = 'block';
+            loadingSpinner.style.display = 'block';
+            notFoundMessage.style.display = 'none';
+            countryResults.style.display = 'none';
+            
+            fetch(`/api/search/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    
+                    if (!data.found) {
+                        notFoundMessage.style.display = 'block';
+                        document.getElementById('notFoundText').textContent = data.message;
+                        return;
+                    }
+                    
+                    displayCountryData(data);
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    notFoundMessage.style.display = 'block';
+                    document.getElementById('notFoundText').textContent = 'Error loading data: ' + error.message;
+                });
+        }
+        
+        // Display country data
+        function displayCountryData(data) {
+            document.getElementById('countryResults').style.display = 'block';
+            document.getElementById('countryName').innerHTML = 
+                `<i class="fas fa-flag"></i> ${data.country} - Energy Profile (${data.latest_year})`;
+            
+            // Update metrics
+            document.getElementById('electricityAccess').textContent = 
+                data.electricity_access ? data.electricity_access.toFixed(1) : 'N/A';
+            document.getElementById('cleanCooking').textContent = 
+                data.clean_cooking_access ? data.clean_cooking_access.toFixed(1) : 'N/A';
+            
+            // Update status alert
+            const statusAlert = document.getElementById('statusAlert');
+            const status = data.status;
+            statusAlert.className = 'alert-box ' + status.status.toLowerCase();
+            statusAlert.innerHTML = `
+                <h4><i class="fas fa-info-circle"></i> Status: ${status.status}</h4>
+                ${status.alerts.map(alert => `<p>${alert}</p>`).join('')}
+            `;
+            
+            // Create basic charts
+            createCharts(data);
+        }
+        
+        // Create charts
+        function createCharts(data) {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+            
+            const years = data.historical_data.map(d => d.Year);
+            
+            // Electricity Access Chart
+            charts.electricity = new Chart(document.getElementById('electricityChart'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Electricity Access (%)',
+                        data: data.historical_data.map(d => d['Access to electricity (% of population)']),
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            // Renewable Energy Chart
+            charts.renewable = new Chart(document.getElementById('renewableChart'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Renewable Share (%)',
+                        data: data.historical_data.map(d => d['Renewable energy share in the total final energy consumption (%)']),
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            loadCountries();
+        });
+        
+        // Handle Enter key in search box
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('countrySearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchCountry();
+                    }
+                });
+            }
+        });
+
+        // Global variables
+
+        // Global variables
+        let map = null;
+        let charts = {};
+        let highlightMarker = null;
+        let dashboardInitialized = false;
+
+        // Page initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, setting up dashboard...');
+            
+            const dashboardSection = document.getElementById('dashboardSection');
+            const toggleBtn = document.getElementById('toggleDashboardBtn');
+            
+            if (dashboardSection) {
+                dashboardSection.style.display = 'none';
+                console.log('Dashboard section hidden on page load');
+            }
+            
+            if (toggleBtn) {
+                console.log('Toggle button found and ready');
+            }
+            
+            // Check if required libraries are loaded
+            if (typeof L !== 'undefined') {
+                console.log('Leaflet library loaded successfully');
+            } else {
+                console.error('Leaflet library not loaded');
+            }
+            
+            if (typeof Chart !== 'undefined') {
+                console.log('Chart.js library loaded successfully');
+            } else {
+                console.error('Chart.js library not loaded');
+            }
+        });
+    </script>
+</body>
+</html>
+

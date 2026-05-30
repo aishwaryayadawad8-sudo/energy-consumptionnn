@@ -1,0 +1,562 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 8: Sustainable Investment Strategy Support</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        .objective-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .objective-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .best-model-banner {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .bolt {
+            color: #667eea;
+        }
+        
+        .country-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .country-section h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .country-section h3 i {
+            margin-right: 10px;
+        }
+        
+        .country-select {
+            border-radius: 10px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            font-size: 1rem;
+        }
+        
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .btn-analyze:hover {
+            opacity: 0.9;
+            color: white;
+        }
+        
+        .btn-analyze i {
+            margin-right: 8px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/country-forecasts/?t=1766296981'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-chart-pie bolt"></i> Objective 8: Sustainable Investment Strategy Support</h1>
+            <p class="text-muted">Machine Learning Model Comparison for Investment Strategy Analysis</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <div class="objective-header">
+                <div class="objective-title">
+                    <i class="fas fa-chart-bar"></i> Sustainable Investment Strategy Support
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="modelComparisonChart"></canvas>
+            </div>
+            <div class="best-model-banner">
+                <i class="fas fa-trophy"></i> Best Model: CatBoost (MSE = 0.0047)
+            </div>
+        </div>
+        
+        <!-- Country Selection Section -->
+        <div class="country-section">
+            <h3><i class="fas fa-globe"></i> Select Country for Investment Strategy Analysis</h3>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select" onchange="onCountryChange()">
+                        <option value="">-- Select a Country --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-analyze w-100" onclick="analyzeCountry()">
+                        <i class="fas fa-search"></i> Analyze Investment
+                    </button>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="loadingSpinner">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p class="mt-2">Loading investment data...</p>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+        </div>
+        
+        <!-- Historical Investment Analysis Chart (2000-2020) -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 style="color: #2c3e50; font-weight: bold; margin-bottom: 20px;">
+                <i class="fas fa-history"></i> Future Investment Strategy Predictions (2000-2020)
+            </h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div class="chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Future Investment Predictions Chart (2021-2030) -->
+        <div class="section-card" id="futureSection" style="display: none;">
+            <h2 style="color: #2c3e50; font-weight: bold; margin-bottom: 20px;">
+                <i class="fas fa-chart-line"></i> Future Investment Strategy Predictions (2021-2030)
+            </h2>
+            <p class="text-muted" id="futureCountryName"></p>
+            <div class="chart-container">
+                <canvas id="futureChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Chart variables
+        let modelComparisonChart = null;
+        let historicalChart = null;
+        let futureChart = null;
+        
+        // Create model comparison chart
+        function createModelComparisonChart() {
+            console.log('🎯 [OBJ8] Loading model comparison instantly...');
+            
+            // Fetch model comparison from API
+            fetch('/api/objective8/model-comparison/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📊 [OBJ8] Model comparison data:', data);
+                    
+                    if (data.success && data.mse_scores) {
+                        const ctx = document.getElementById('modelComparisonChart');
+                        
+                        const labels = Object.keys(data.mse_scores);
+                        const values = Object.values(data.mse_scores);
+                        const bestModel = data.best_model;
+                        
+                        console.log('✅ [OBJ8] Found', labels.length, 'models, best:', bestModel);
+                        
+                        // Color best model gold, others blue
+                        const colors = labels.map(label => 
+                            label === bestModel ? '#FFD700' : '#667eea'
+                        );
+                        
+                        modelComparisonChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'MSE',
+                                    data: values,
+                                    backgroundColor: colors,
+                                    borderColor: colors.map(c => c === '#FFD700' ? '#FFA500' : '#4a5fc1'),
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Model Comparison (MSE)',
+                                        font: {
+                                            size: 16,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Mean Squared Error (MSE)'
+                                        }
+                                    },
+                                    x: {
+                                        ticks: {
+                                            maxRotation: 45
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Update the best model banner
+                        const banner = document.querySelector('.best-model-banner');
+                        if (banner) {
+                            banner.innerHTML = `<i class="fas fa-trophy"></i> Best Model: ${bestModel} (MSE = ${data.best_score.toFixed(4)})`;
+                        }
+                        
+                        console.log('✅ [OBJ8] Model comparison chart created successfully!');
+                    } else {
+                        console.error('❌ [OBJ8] Failed to load model comparison data');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ [OBJ8] Error loading model comparison:', error);
+                });
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            createModelComparisonChart();
+            loadCountries();
+        };
+
+        function showMessage(type, message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            // Hide both first
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            if (type === 'error') {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            } else if (type === 'success') {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function loadCountries() {
+            fetch('/api/objective8/countries/')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                        showMessage('success', `Loaded ${data.countries.length} countries successfully!`);
+                    } else {
+                        showMessage('error', 'Failed to load countries. Please refresh the page.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading countries:', err);
+                    showMessage('error', 'Error loading countries. Please check your connection.');
+                });
+        }
+        
+        // Called when country selection changes
+        function onCountryChange() {
+            const country = document.getElementById('countrySelect').value;
+            if (country) {
+                showMessage('success', `Selected: ${country}. Click "Analyze Investment" to view strategy.`);
+            }
+        }
+
+        function analyzeCountry() {
+            console.log('🎯 [OBJ8] Starting investment analysis for:', document.getElementById('countrySelect').value);
+            const country = document.getElementById('countrySelect').value;
+            if (!country) { 
+                showMessage('error', 'Please select a country first!');
+                return; 
+            }
+
+            // Show loading
+            document.getElementById('loadingSpinner').style.display = 'block';
+            showMessage('success', `Analyzing investment strategy for ${country}...`);
+
+            // Show sections
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('futureSection').style.display = 'block';
+            
+            // Update country names
+            document.getElementById('historicalCountryName').textContent = `Investment strategy predictions for ${country} (2000-2020)`;
+            document.getElementById('futureCountryName').textContent = `Investment strategy predictions for ${country} (2021-2030)`;
+
+            // Load historical data
+            fetch(`/api/objective8/historical/?country=${encodeURIComponent(country)}`)
+                .then(r => r.json())
+                .then(historicalData => {
+                    console.log('Historical data:', historicalData);
+                    
+                    if (historicalData.success) {
+                        createHistoricalChart(historicalData.data, country);
+                    }
+                    
+                    // Load future predictions
+                    return fetch(`/api/objective8/predictions/?country=${encodeURIComponent(country)}`);
+                })
+                .then(r => r.json())
+                .then(futureData => {
+                    console.log('Future data:', futureData);
+                    
+                    if (futureData.success) {
+                        createFutureChart(futureData.predictions, country);
+                    }
+                    
+                    showMessage('success', `Investment strategy analysis complete for ${country}!`);
+                })
+                .catch(err => {
+                    console.error('Error in analysis:', err);
+                    showMessage('error', `Error analyzing ${country}: ${err.message}`);
+                })
+                .finally(() => {
+                    // Hide loading spinner
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                });
+        }
+        
+        function createHistoricalChart(data, country) {
+            const ctx = document.getElementById('historicalChart');
+            
+            if (historicalChart) {
+                historicalChart.destroy();
+            }
+            
+            const years = data.map(d => d.Year);
+            const investmentScore = data.map(d => d.Investment_Score);
+            const greenInvestment = data.map(d => d.Green_Investment_Share);
+            
+            historicalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Investment Score',
+                        data: investmentScore,
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }, {
+                        label: 'Green Investment Share (%)',
+                        data: greenInvestment,
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Future Investment Strategy Predictions (2000-2020) - ${country}`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Score / Percentage'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createFutureChart(data, country) {
+            const ctx = document.getElementById('futureChart');
+            
+            if (futureChart) {
+                futureChart.destroy();
+            }
+            
+            const years = data.map(d => d.Year);
+            const investmentScore = data.map(d => d.Predicted_Investment_Score);
+            const greenInvestment = data.map(d => d.Predicted_Green_Investment);
+            const roiPotential = data.map(d => d.Predicted_ROI_Potential);
+            
+            futureChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Predicted Investment Score',
+                        data: investmentScore,
+                        borderColor: 'rgba(155, 89, 182, 1)',
+                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: true
+                    }, {
+                        label: 'Predicted Green Investment (%)',
+                        data: greenInvestment,
+                        borderColor: 'rgba(241, 196, 15, 1)',
+                        backgroundColor: 'rgba(241, 196, 15, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: true
+                    }, {
+                        label: 'ROI Potential (%)',
+                        data: roiPotential,
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Future Investment Strategy Predictions (2021-2030) - ${country}`,
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Score / Percentage'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

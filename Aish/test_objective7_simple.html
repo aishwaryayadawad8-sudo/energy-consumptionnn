@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Objective 7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #e67e22; }
+        h2 { color: #d35400; }
+        .result { 
+            background: #ecf0f1;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        button {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #d35400; }
+    </style>
+</head>
+<body>
+    <h1>🌞 Objective 7: Renewable Energy Investment Potential - Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Quick Links</h2>
+        <button onclick="window.open('http://127.0.0.1:8000/', '_blank')">🏠 Home Selector</button>
+        <button onclick="window.open('http://127.0.0.1:8000/objective7/', '_blank')">🌞 Objective 7 Dashboard</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>1. Model Comparison API</h2>
+        <button onclick="testModelComparison()">Test Model Comparison</button>
+        <div id="modelResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Countries API</h2>
+        <button onclick="testCountries()">Test Countries List</button>
+        <div id="countriesResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Historical Data API</h2>
+        <button onclick="testHistorical()">Test Historical Data</button>
+        <div id="historicalResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Future Predictions API</h2>
+        <button onclick="testPredictions()">Test Predictions</button>
+        <div id="predictionsResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Combined Data API</h2>
+        <button onclick="testCombined()">Test Combined Data</button>
+        <div id="combinedResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Run All Tests</h2>
+        <button onclick="runAllTests()">▶️ Run All Tests</button>
+    </div>
+    
+    <script>
+        async function testModelComparison() {
+            const result = document.getElementById('modelResult');
+            result.innerHTML = 'Testing...';
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/objective7/model-comparison/');
+                const data = await response.json();
+                result.innerHTML = `<span class="success">✓ Success!</span>\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Error:</span> ${error.message}`;
+            }
+        }
+        
+        async function testCountries() {
+            const result = document.getElementById('countriesResult');
+            result.innerHTML = 'Testing...';
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/objective7/countries/');
+                const data = await response.json();
+                result.innerHTML = `<span class="success">✓ Success!</span>\nFound ${data.countries.length} countries\nSample: ${data.countries.slice(0, 5).join(', ')}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Error:</span> ${error.message}`;
+            }
+        }
+        
+        async function testHistorical() {
+            const result = document.getElementById('historicalResult');
+            result.innerHTML = 'Testing...';
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/objective7/historical/?country=United States');
+                const data = await response.json();
+                result.innerHTML = `<span class="success">✓ Success!</span>\n${data.data.length} data points for United States\n${JSON.stringify(data.data[0], null, 2)}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Error:</span> ${error.message}`;
+            }
+        }
+        
+        async function testPredictions() {
+            const result = document.getElementById('predictionsResult');
+            result.innerHTML = 'Testing...';
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/objective7/predictions/?country=United States&years=5');
+                const data = await response.json();
+                result.innerHTML = `<span class="success">✓ Success!</span>\n${data.predictions.length} predictions\n${JSON.stringify(data.predictions[0], null, 2)}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Error:</span> ${error.message}`;
+            }
+        }
+        
+        async function testCombined() {
+            const result = document.getElementById('combinedResult');
+            result.innerHTML = 'Testing...';
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/objective7/combined/?country=United States');
+                const data = await response.json();
+                const historical = data.data.filter(d => d.type === 'historical').length;
+                const predicted = data.data.filter(d => d.type === 'predicted').length;
+                result.innerHTML = `<span class="success">✓ Success!</span>\nTotal: ${data.data.length} points\nHistorical: ${historical}, Predicted: ${predicted}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Error:</span> ${error.message}`;
+            }
+        }
+        
+        async function runAllTests() {
+            await testModelComparison();
+            await new Promise(r => setTimeout(r, 500));
+            await testCountries();
+            await new Promise(r => setTimeout(r, 500));
+            await testHistorical();
+            await new Promise(r => setTimeout(r, 500));
+            await testPredictions();
+            await new Promise(r => setTimeout(r, 500));
+            await testCombined();
+        }
+    </script>
+</body>
+</html>

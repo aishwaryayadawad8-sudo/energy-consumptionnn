@@ -1,0 +1,613 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Custom Alert to Country - SDG 7</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            background: white;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 25px;
+        }
+        
+        .form-section {
+            padding: 30px;
+        }
+        
+        .form-label {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .country-dropdown {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .form-control {
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 0.2rem rgba(118, 75, 162, 0.25);
+        }
+        
+        textarea.form-control {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .btn-send {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn-send:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-send:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .country-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .result-success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        
+        .result-error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .char-counter {
+            text-align: right;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .template-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .template-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .template-btn:hover {
+            background: #764ba2;
+        }
+    </style></head>
+<body>
+    <div class="container">
+        <a href="{% url 'admin_panel' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Admin Page
+        </a>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-paper-plane"></i> Send Custom Alert to Country</h2>
+                <p class="mb-0">Select a country and write your custom alert message</p>
+            </div>
+            <div class="card-body form-section">
+                <!-- Country Selection -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-globe"></i> Select Country
+                    </label>
+                    <select id="countrySelect" class="country-dropdown">
+                        <option value="">-- Choose a Country --</option>
+                    </select>
+                </div>
+                
+                <!-- Country Info -->
+                <div id="countryInfo" class="country-info">
+                    <h5><i class="fas fa-info-circle"></i> Country Information</h5>
+                    <div class="info-row">
+                        <span class="info-label">Country:</span>
+                        <span id="infoCountry">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span id="infoEmail">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Current Access:</span>
+                        <span id="infoAccess">-</span>
+                    </div>
+                </div>
+                
+                <!-- Message Templates -->
+                <div class="template-section">
+                    <label class="form-label">
+                        <i class="fas fa-file-alt"></i> Quick Templates (Click to use)
+                    </label>
+                    <div>
+                        <button class="template-btn" onclick="useTemplate('urgent')">🚨 Urgent Alert</button>
+                        <button class="template-btn" onclick="useTemplate('reminder')">📢 Reminder</button>
+                        <button class="template-btn" onclick="useTemplate('congratulations')">🎉 Congratulations</button>
+                        <button class="template-btn" onclick="useTemplate('update')">📊 Status Update</button>
+                    </div>
+                </div>
+                
+                <!-- Email Subject -->
+                <div class="mb-4">
+                    <label for="emailSubject" class="form-label">
+                        <i class="fas fa-heading"></i> Email Subject
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="emailSubject" 
+                        placeholder="Enter email subject..."
+                        maxlength="200"
+                    >
+                    <div class="char-counter">
+                        <span id="subjectCounter">0</span>/200 characters
+                    </div>
+                </div>
+                
+                <!-- Alert Message -->
+                <div class="mb-4">
+                    <label for="alertMessage" class="form-label">
+                        <i class="fas fa-envelope-open-text"></i> Alert Message
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="alertMessage" 
+                        placeholder="Write your custom alert message here...&#10;&#10;Example:&#10;Dear Energy Ministry,&#10;&#10;We would like to inform you about...&#10;&#10;Best regards,&#10;SDG 7 Monitoring Team"
+                        maxlength="2000"
+                    ></textarea>
+                    <div class="char-counter">
+                        <span id="messageCounter">0</span>/2000 characters
+                    </div>
+                </div>
+                
+                <!-- Loading -->
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p><strong>Sending your custom alert...</strong></p>
+                </div>
+                
+                <!-- Result -->
+                <div id="result" class="result-box"></div>
+                
+                <!-- Send Button -->
+                <button id="sendBtn" class="btn-send" disabled>
+                    <i class="fas fa-paper-plane"></i> Send Custom Alert
+                </button>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-question-circle"></i> How to Use</h4>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li><strong>Select Country:</strong> Choose the country you want to send the alert to</li>
+                    <li><strong>Use Template (Optional):</strong> Click a template button to start with a pre-written message</li>
+                    <li><strong>Write Subject:</strong> Enter a clear and concise email subject</li>
+                    <li><strong>Write Message:</strong> Type your custom alert message</li>
+                    <li><strong>Send:</strong> Click the "Send Custom Alert" button</li>
+                </ol>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Be clear and professional in your message. Include specific actions or recommendations for the country.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let selectedCountry = '';
+        let countryEmail = '';
+        
+        // Message templates
+        const templates = {
+            urgent: {
+                subject: '🚨 URGENT: Immediate Action Required - Electricity Access',
+                message: `Dear Energy Ministry,
+
+URGENT ALERT: This is a critical notification regarding electricity access in your country.
+
+Our monitoring system has identified areas requiring immediate attention. We recommend:
+
+1. Assess current electricity infrastructure
+2. Identify underserved regions
+3. Develop emergency response plan
+4. Coordinate with international partners
+
+Please respond within 48 hours to discuss support options.
+
+Best regards,
+SDG 7 Global Monitoring Team`
+            },
+            reminder: {
+                subject: '📢 Reminder: SDG 7 Progress Update Required',
+                message: `Dear Energy Ministry,
+
+This is a friendly reminder about your SDG 7 progress update.
+
+We would appreciate receiving:
+- Latest electricity access statistics
+- Recent infrastructure projects
+- Challenges and support needs
+- Future plans and targets
+
+Please submit your update at your earliest convenience.
+
+Thank you for your cooperation.
+
+Best regards,
+SDG 7 Monitoring Team`
+            },
+            congratulations: {
+                subject: '🎉 Congratulations on Your SDG 7 Progress!',
+                message: `Dear Energy Ministry,
+
+Congratulations! We are pleased to recognize your excellent progress toward SDG 7 targets.
+
+Your achievements include:
+- Improved electricity access rates
+- Successful infrastructure projects
+- Effective policy implementation
+
+We commend your dedication and would like to feature your success story in our next report.
+
+Keep up the excellent work!
+
+Best regards,
+SDG 7 Global Monitoring Team`
+            },
+            update: {
+                subject: '📊 SDG 7 Status Update and Recommendations',
+                message: `Dear Energy Ministry,
+
+We are writing to provide you with an update on your country's SDG 7 progress.
+
+Current Status:
+- Electricity access levels have been analyzed
+- Trends have been identified
+- Recommendations are available
+
+We would like to schedule a consultation to discuss:
+- Current challenges
+- Available support programs
+- Best practices from other countries
+
+Please let us know your availability.
+
+Best regards,
+SDG 7 Monitoring Team`
+            }
+        };
+        
+        // Load countries on page load
+        $(document).ready(function() {
+            loadCountries();
+            setupCharCounters();
+            checkFormValidity();
+        });
+        
+        function loadCountries() {
+            $.get('/api/objective4/countries/', function(data) {
+                if (data.success) {
+                    const countries = data.countries.sort();
+                    countries.forEach(country => {
+                        $('#countrySelect').append(
+                            $('<option></option>').val(country).text(country)
+                        );
+                    });
+                }
+            });
+        }
+        
+        // When country is selected
+        $('#countrySelect').change(function() {
+            selectedCountry = $(this).val();
+            
+            if (selectedCountry) {
+                loadCountryInfo(selectedCountry);
+                checkFormValidity();
+            } else {
+                $('#countryInfo').hide();
+                $('#sendBtn').prop('disabled', true);
+            }
+        });
+        
+        function loadCountryInfo(country) {
+            countryEmail = getCountryEmail(country);
+            
+            // Get prediction
+            $.get('/api/objective4/predictions/', {
+                country: country,
+                years: 1
+            }, function(data) {
+                if (data.success && data.predictions && data.predictions.length > 0) {
+                    const prediction = data.predictions[0];
+                    const access = prediction[2];
+                    
+                    $('#infoCountry').text(country);
+                    $('#infoEmail').text(countryEmail);
+                    $('#infoAccess').text(access.toFixed(1) + '%');
+                    
+                    $('#countryInfo').show();
+                }
+            });
+        }
+        
+        function getCountryEmail(country) {
+            const countryCode = country.toLowerCase().replace(/\s+/g, '');
+            return `${countryCode}.energy@gov.${countryCode.substring(0, 2)}`;
+        }
+        
+        // Character counters
+        function setupCharCounters() {
+            $('#emailSubject').on('input', function() {
+                const length = $(this).val().length;
+                $('#subjectCounter').text(length);
+                checkFormValidity();
+            });
+            
+            $('#alertMessage').on('input', function() {
+                const length = $(this).val().length;
+                $('#messageCounter').text(length);
+                checkFormValidity();
+            });
+        }
+        
+        // Check if form is valid
+        function checkFormValidity() {
+            const country = $('#countrySelect').val();
+            const subject = $('#emailSubject').val().trim();
+            const message = $('#alertMessage').val().trim();
+            
+            if (country && subject && message) {
+                $('#sendBtn').prop('disabled', false);
+            } else {
+                $('#sendBtn').prop('disabled', true);
+            }
+        }
+        
+        // Use template
+        function useTemplate(type) {
+            const template = templates[type];
+            $('#emailSubject').val(template.subject);
+            $('#alertMessage').val(template.message);
+            
+            // Update counters
+            $('#subjectCounter').text(template.subject.length);
+            $('#messageCounter').text(template.message.length);
+            
+            checkFormValidity();
+        }
+        
+        // Send custom alert
+        $('#sendBtn').click(function() {
+            const country = $('#countrySelect').val();
+            const subject = $('#emailSubject').val().trim();
+            const message = $('#alertMessage').val().trim();
+            
+            if (!country || !subject || !message) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Show loading
+            $('#loading').show();
+            $('#result').hide();
+            $('#sendBtn').prop('disabled', true);
+            
+            // Send custom alert
+            $.ajax({
+                url: '/api/send-custom-alert/',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    country: country,
+                    email: countryEmail,
+                    subject: subject,
+                    message: message
+                }),
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    $('#loading').hide();
+                    
+                    if (response.success) {
+                        $('#result')
+                            .removeClass('result-error')
+                            .addClass('result-success')
+                            .html(`
+                                <h5><i class="fas fa-check-circle"></i> Custom Alert Sent Successfully!</h5>
+                                <p><strong>Country:</strong> ${country}</p>
+                                <p><strong>Email:</strong> ${countryEmail}</p>
+                                <p><strong>Subject:</strong> ${subject}</p>
+                                <p>Your custom alert has been sent to the country's energy ministry.</p>
+                            `)
+                            .show();
+                        
+                        // Clear form
+                        setTimeout(function() {
+                            $('#emailSubject').val('');
+                            $('#alertMessage').val('');
+                            $('#subjectCounter').text('0');
+                            $('#messageCounter').text('0');
+                            checkFormValidity();
+                        }, 3000);
+                    } else {
+                        $('#result')
+                            .removeClass('result-success')
+                            .addClass('result-error')
+                            .html(`
+                                <h5><i class="fas fa-exclamation-circle"></i> Error Sending Alert</h5>
+                                <p>${response.error || 'Unknown error occurred'}</p>
+                            `)
+                            .show();
+                        $('#sendBtn').prop('disabled', false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#loading').hide();
+                    $('#sendBtn').prop('disabled', false);
+                    
+                    $('#result')
+                        .removeClass('result-success')
+                        .addClass('result-error')
+                        .html(`
+                            <h5><i class="fas fa-exclamation-circle"></i> Error</h5>
+                            <p>Failed to send alert: ${error}</p>
+                        `)
+                        .show();
+                }
+            });
+        });
+        
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
+

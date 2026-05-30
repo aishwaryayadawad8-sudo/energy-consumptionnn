@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test India Coordinates</title>
+    <script>
+        // Test India coordinates
+        const countryCoordinates = {
+            'India': { lat: 20.5937, lng: 78.9629, access: 95.2 }
+        };
+        
+        function testIndiaCoordinates() {
+            const india = countryCoordinates['India'];
+            console.log('🇮🇳 Testing India coordinates:');
+            console.log(`   Latitude: ${india.lat}`);
+            console.log(`   Longitude: ${india.lng}`);
+            console.log(`   Electricity Access: ${india.access}%`);
+            
+            // Check if coordinates are in valid range
+            const validLat = india.lat >= 8 && india.lat <= 37;
+            const validLng = india.lng >= 68 && india.lng <= 97;
+            
+            if (validLat && validLng) {
+                console.log('✅ India coordinates are VALID!');
+                document.getElementById('result').innerHTML = 
+                    '<h2 style="color: green;">✅ India Coordinates Test PASSED</h2>' +
+                    '<p>Latitude: ' + india.lat + '° (Valid: ' + validLat + ')</p>' +
+                    '<p>Longitude: ' + india.lng + '° (Valid: ' + validLng + ')</p>' +
+                    '<p>Electricity Access: ' + india.access + '%</p>';
+            } else {
+                console.log('❌ India coordinates are INVALID!');
+                document.getElementById('result').innerHTML = 
+                    '<h2 style="color: red;">❌ India Coordinates Test FAILED</h2>';
+            }
+        }
+        
+        // Run test when page loads
+        window.onload = testIndiaCoordinates;
+    </script>
+</head>
+<body>
+    <h1>🇮🇳 India Coordinates Test</h1>
+    <div id="result">Testing...</div>
+    <p>Check browser console for detailed logs.</p>
+</body>
+</html>

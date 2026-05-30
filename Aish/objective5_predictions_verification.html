@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Objective 5 Predictions Verification</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .chart-container { width: 100%; height: 400px; margin: 20px 0; }
+        .success { color: green; font-weight: bold; }
+        .info { background: #f0f8ff; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Objective 5 Predictions Chart - Verification</h1>
+        
+        <div class="info">
+            <h3>✅ Verification Results:</h3>
+            <p><strong>Country:</strong> Afghanistan</p>
+            <p><strong>Predictions:</strong> 10 data points</p>
+            <p><strong>Year Range:</strong> 2021 - 2030</p>
+            <p><strong>Access Range:</strong> 88.5% - 94.2%</p>
+        </div>
+        
+        <h2>📊 Predictions Chart</h2>
+        <div class="chart-container">
+            <canvas id="predictionsChart"></canvas>
+        </div>
+        
+        <div class="info">
+            <h3>🔧 How to fix the main application:</h3>
+            <ol>
+                <li>Restart Django server: <code>python manage.py runserver</code></li>
+                <li>Open <a href="http://localhost:8000/objective5/" target="_blank">http://localhost:8000/objective5/</a></li>
+                <li>Open browser console (F12)</li>
+                <li>Select "Afghanistan" from dropdown</li>
+                <li>Click "Analyze Country"</li>
+                <li>Look for [PREDICTIONS] messages in console</li>
+                <li>The predictions chart should now appear!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Chart data
+        const chartData = {
+            years: [2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030],
+            values: [88.4686659431602, 89.10900342139803, 89.74934089963585, 90.3896783778739, 91.03001585611173, 91.67035333434956, 92.31069081258738, 92.9510282908252, 93.59136576906303, 94.23170324730108],
+            country: "Afghanistan"
+        };
+        
+        console.log('Chart data:', chartData);
+        
+        // Create chart
+        const ctx = document.getElementById('predictionsChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.years,
+                datasets: [{
+                    label: chartData.country + ' - Predicted Access (%)',
+                    data: chartData.values,
+                    borderColor: 'rgba(56, 239, 125, 1)',
+                    backgroundColor: 'rgba(56, 239, 125, 0.2)',
+                    borderWidth: 3,
+                    borderDash: [10, 5],
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: 'rgba(56, 239, 125, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: true,
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Future Electricity Access Predictions - ' + chartData.country,
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: { 
+                            display: true, 
+                            text: 'Access (%)'
+                        }
+                    },
+                    x: {
+                        title: { 
+                            display: true, 
+                            text: 'Year'
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('✅ Chart created successfully!');
+    </script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 2: CO₂ Emission Forecasting</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-top: 20px;
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .co2-icon {
+            color: #e74c3c;
+        }
+        
+        .country-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .country-section h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .country-section h3 i {
+            margin-right: 10px;
+        }
+        
+        .country-select {
+            border-radius: 10px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            font-size: 1rem;
+        }
+        
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .btn-analyze:hover {
+            opacity: 0.9;
+            color: white;
+        }
+        
+        .btn-analyze i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/country-forecasts/?t=1766296981'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-smog co2-icon"></i> Objective 2: CO₂ Emission Forecasting</h1>
+            <p class="text-muted">Machine Learning Model Comparison for CO₂ Emissions Forecasting</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <div class="best-model-badge"><i class="fas fa-star"></i> Best Model: XGBoost (MSE = 0.0048)</div>
+            <div class="chart-container">
+                <canvas id="mseChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Country Selection Section -->
+        <div class="country-section">
+            <h3><i class="fas fa-globe"></i> Select Country for Analysis</h3>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select">
+                        <option value="">-- Select a Country --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-analyze w-100" onclick="analyzeCountry()">
+                        <i class="fas fa-search"></i> Analyze Country
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 style="color: #2c3e50; font-weight: bold; margin-bottom: 20px;">
+                <i class="fas fa-history"></i> Historical CO₂ Emissions
+            </h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div class="chart-container">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Future Predictions Section -->
+        <div class="section-card" id="predictionsSection" style="display: none;">
+            <h2 style="color: #2c3e50; font-weight: bold; margin-bottom: 20px;">
+                <i class="fas fa-crystal-ball"></i> Future CO₂ Emissions Forecast (2021-2030)
+            </h2>
+            <p class="text-muted" id="predictionsCountryName"></p>
+            <div class="chart-container">
+                <canvas id="predictionsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let historicalChart = null;
+        let predictionsChart = null;
+        
+        // Hardcoded results for Sub-objective 2
+        const mseScores = {
+            "Linear Regression": 0.0370,
+            "Decision Tree": 0.0085,
+            "KNN": 0.0089,
+            "XGBoost": 0.0048,
+            "LightGBM": 0.0349,
+            "CatBoost": 0.0072,
+            "Random Forest": 0.0074
+        };
+        
+        window.onload = function() {
+            loadModelComparison();
+            loadCountries();
+        };
+        
+        function loadModelComparison() {
+            const ctx = document.getElementById('mseChart').getContext('2d');
+            
+            const modelOrder = ['Linear Regression', 'Decision Tree', 'KNN', 'XGBoost', 'LightGBM', 'CatBoost', 'Random Forest'];
+            const models = [];
+            const mseValues = [];
+            const backgroundColors = [];
+            const borderColors = [];
+            
+            modelOrder.forEach(model => {
+                if (mseScores[model] !== undefined) {
+                    models.push(model);
+                    mseValues.push(mseScores[model]);
+                    
+                    if (model === 'XGBoost') {
+                        backgroundColors.push('rgba(255, 193, 7, 0.8)');
+                        borderColors.push('rgba(255, 193, 7, 1)');
+                    } else {
+                        backgroundColors.push('rgba(102, 126, 234, 0.7)');
+                        borderColors.push('rgba(102, 126, 234, 1)');
+                    }
+                }
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: 'MSE',
+                        data: mseValues,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'CO2 Emission Forecasting (MSE)',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            },
+                            align: 'start'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'MSE: ' + context.parsed.y.toFixed(4);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'MSE',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 30
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDatasetsDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        chart.data.datasets.forEach(function(dataset, i) {
+                            const meta = chart.getDatasetMeta(i);
+                            if (!meta.hidden) {
+                                meta.data.forEach(function(element, index) {
+                                    ctx.fillStyle = 'rgb(0, 0, 0)';
+                                    const fontSize = 11;
+                                    const fontStyle = 'bold';
+                                    const fontFamily = 'Arial';
+                                    ctx.font = fontStyle + ' ' + fontSize + 'px ' + fontFamily;
+                                    
+                                    const dataString = dataset.data[index].toFixed(4);
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                                    
+                                    const padding = 5;
+                                    const position = element.tooltipPosition();
+                                    ctx.fillText(dataString, position.x, position.y - padding);
+                                });
+                            }
+                        });
+                    }
+                }]
+            });
+        }
+        
+        function loadCountries() {
+            fetch('/api/objective2/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+        function analyzeCountry() {
+            const country = document.getElementById('countrySelect').value;
+            
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            
+            // Load historical data
+            fetch(`/api/objective2/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        document.getElementById('historicalSection').style.display = 'block';
+                        document.getElementById('historicalCountryName').textContent = 
+                            `CO₂ emissions trends for ${country}`;
+                        
+                        const ctx = document.getElementById('historicalChart').getContext('2d');
+                        
+                        if (historicalChart) {
+                            historicalChart.destroy();
+                        }
+                        
+                        const years = data.data.map(d => d.Year);
+                        const emissions = data.data.map(d => d['Value_co2_emissions_kt_by_country']);
+                        
+                        historicalChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'CO₂ Emissions (kt)',
+                                    data: emissions,
+                                    borderColor: 'rgba(231, 76, 60, 1)',
+                                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Kilotons (kt)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading historical data:', error));
+            
+            // Load predictions
+            fetch(`/api/objective2/predictions/?country=${encodeURIComponent(country)}&years=10`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.predictions.length > 0) {
+                        document.getElementById('predictionsSection').style.display = 'block';
+                        document.getElementById('predictionsCountryName').textContent = 
+                            `Predicted CO₂ emissions for ${country}`;
+                        
+                        const ctx = document.getElementById('predictionsChart').getContext('2d');
+                        
+                        if (predictionsChart) {
+                            predictionsChart.destroy();
+                        }
+                        
+                        const years = data.predictions.map(d => d.year);
+                        const predictions = data.predictions.map(d => d.predicted_emissions);
+                        
+                        predictionsChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: years,
+                                datasets: [{
+                                    label: 'Predicted CO₂ Emissions (kt)',
+                                    data: predictions,
+                                    borderColor: 'rgba(230, 126, 34, 1)',
+                                    backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4,
+                                    borderDash: [5, 5]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Kilotons (kt)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Year'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading predictions:', error));
+        }
+    </script>
+</body>
+</html>

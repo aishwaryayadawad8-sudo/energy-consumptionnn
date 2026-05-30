@@ -1,0 +1,170 @@
+﻿{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}EnerVision 2050 - Sustainable Energy Dashboard{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/clean-professional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Clean Header -->
+<div class="clean-header">
+    <div class="header-content">
+        <div class="logo-clean">
+            <div class="logo-icon">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div>
+                <h1 class="title-clean">EnerVision 2050</h1>
+                <p class="subtitle-clean">Sustainable Energy Intelligence Platform</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clean Navigation -->
+<div class="nav-clean">
+    <div class="nav-container">
+        <div class="nav-grid">
+            <a href="{% url 'objective1_dashboard' %}" class="nav-item fade-in-up">
+                <div class="nav-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="nav-label">Energy Consumption</div>
+                <div class="nav-desc">Analyze global energy consumption patterns and trends</div>
+            </a>
+            
+            <a href="{% url 'objective2_dashboard' %}" class="nav-item fade-in-up">
+                <div class="nav-icon">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div class="nav-label">Electricity Access</div>
+                <div class="nav-desc">Monitor electricity access across different regions</div>
+            </a>
+            
+            <a href="{% url 'objective3_dashboard' %}" class="nav-item fade-in-up">
+                <div class="nav-icon">
+                    <i class="fas fa-solar-panel"></i>
+                </div>
+                <div class="nav-label">Renewable Energy</div>
+                <div class="nav-desc">Track renewable energy adoption and growth</div>
+            </a>
+            
+            <a href="{% url 'objective4_dashboard' %}" class="nav-item fade-in-up">
+                <div class="nav-icon">
+                    <i class="fas fa-smog"></i>
+                </div>
+                <div class="nav-label">CO Emissions</div>
+                <div class="nav-desc">Analyze carbon emissions and environmental impact</div>
+            </a>
+            
+            <a href="{% url 'objective5_dashboard' %}" class="nav-item fade-in-up">
+                <div class="nav-icon">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="nav-label">Country Forecasts</div>
+                <div class="nav-desc">Predictive analytics for country-specific energy trends</div>
+            </a>
+            
+            <a href="{% url 'comprehensive_comparison_dashboard' %}" class="nav-item fade-in-up">
+                <div class="nav-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="nav-label">ML Comparison</div>
+                <div class="nav-desc">Compare machine learning model performance</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="content-container fade-in-up">
+        <h2 class="main-title">Sustainable Energy Analytics</h2>
+        <p class="main-subtitle">Advanced data insights for a sustainable future powered by machine learning and predictive analytics</p>
+        <a href="/dashboard/" class="cta-button">
+            <i class="fas fa-rocket"></i>
+            Explore Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="features-section">
+    <div class="features-container">
+        <h3 class="section-title">Platform Features</h3>
+        
+        <div class="features-grid">
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h4 class="feature-title">Smart Analytics</h4>
+                <p class="feature-desc">
+                    Advanced AI-powered analysis of energy data across 128+ countries with real-time insights and trends.
+                </p>
+                <a href="/dashboard/" class="feature-btn">Explore Analytics</a>
+            </div>
+            
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h4 class="feature-title">ML Models</h4>
+                <p class="feature-desc">
+                    Compare multiple machine learning models with interactive visualizations and performance metrics.
+                </p>
+                <a href="/comprehensive-comparison/" class="feature-btn">View Models</a>
+            </div>
+            
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h4 class="feature-title">Smart Alerts</h4>
+                <p class="feature-desc">
+                    Intelligent notification system with predictive alerts and automated reporting capabilities.
+                </p>
+                <a href="/objective8/" class="feature-btn">Setup Alerts</a>
+            </div>
+            
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h4 class="feature-title">Admin Panel</h4>
+                <p class="feature-desc">
+                    Comprehensive administrative control panel with user management and system configuration.
+                </p>
+                <a href="/admin-panel/" class="feature-btn">Admin Access</a>
+            </div>
+            
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h4 class="feature-title">Predictions</h4>
+                <p class="feature-desc">
+                    Advanced forecasting system with multi-dimensional analysis and temporal prediction models.
+                </p>
+                <a href="/objective5/" class="feature-btn">View Predictions</a>
+            </div>
+            
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h4 class="feature-title">Full Analysis</h4>
+                <p class="feature-desc">
+                    Complete analysis suite combining all modules into one unified intelligence platform.
+                </p>
+                <a href="/full-analysis/" class="feature-btn">Full Report</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

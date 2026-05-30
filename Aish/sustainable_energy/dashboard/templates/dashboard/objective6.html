@@ -1,0 +1,472 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objective 6: Efficiency Optimization Identification</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 600px;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .btn-load {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        
+        .btn-load:hover {
+            opacity: 0.9;
+        }
+        
+        .country-select {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .country-select:focus {
+            border-color: #e67e22;
+            box-shadow: 0 0 0 0.2rem rgba(230, 126, 34, 0.25);
+        }
+        
+        .best-model-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style></head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <button class="back-btn" onclick="window.location.href='/country-forecasts/?t=1766296981'">
+                <i class="fas fa-arrow-left"></i> Back to Objectives
+            </button>
+            <h1><i class="fas fa-solar-panel"></i> Objective 6: Efficiency Optimization Identification</h1>
+            <p class="text-muted">Identify high-consumption regions and inefficiencies in energy usage that can be optimized for better sustainability outcomes</p>
+        </div>
+        
+        <!-- Model Comparison Section -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> Model Accuracy Comparison</h2>
+            <p class="text-muted">Classification task - Auto-loading efficiency optimization model comparison...</p>
+            <div id="modelComparisonLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p>Model comparison loading...</p>
+            </div>
+            <div id="bestModelInfo" style="display: none; margin-top: 15px;"></div>
+            <div id="accuracyChart" class="chart-container"></div>
+        </div>
+        
+        <!-- Country Selection -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fas fa-globe"></i> Select Country for Analysis</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <select id="countrySelect" class="form-select country-select">
+                        <option value="">Loading countries...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-load w-100" onclick="loadCountryData()">
+                        <i class="fas fa-search"></i> Analyze Country
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="section-card" id="historicalSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-history"></i> Historical Efficiency Data</h2>
+            <p class="text-muted" id="historicalCountryName"></p>
+            <div id="historicalLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p>Loading historical data...</p>
+            </div>
+            <div id="historicalChart" class="chart-container"></div>
+        </div>
+        
+        <!-- Combined Historical + Future Section -->
+        <div class="section-card" id="combinedSection" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Efficiency Optimization Analysis (Historical + Future)</h2>
+            <p class="text-muted" id="combinedCountryName"></p>
+            <div id="combinedLoading" class="loading" style="display: none;">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p>Loading combined data...</p>
+            </div>
+            <div id="combinedChart" class="chart-container"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.onload = function() {
+            console.log('Page loaded, initializing Objective 6...');
+            
+            // Load countries dropdown
+            loadCountries();
+            
+            // Auto-load model comparison immediately
+            console.log('Auto-loading model comparison...');
+            loadModelComparison();
+        };
+        
+        function loadCountries() {
+            fetch('/api/objective6/countries/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('countrySelect');
+                        select.innerHTML = '<option value="">-- Select a Country --</option>';
+                        data.countries.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+        function loadCountryData() {
+            const country = document.getElementById('countrySelect').value;
+            if (!country) {
+                alert('Please select a country');
+                return;
+            }
+            loadHistoricalData(country);
+            loadCombinedData(country);
+        }
+        
+        function loadModelComparison() {
+            // Loading instantly - no spinner needed
+            fetch('/api/objective6/model-comparison/')
+                .then(response => response.json())
+                .then(data => {
+                    // Loading complete - chart appears instantly
+                    
+                    if (data.success) {
+                        const models = Object.keys(data.mse_scores);
+                        const accuracyValues = Object.values(data.mse_scores);
+                        
+                        // Debug: Log the models to console
+                        console.log('Models:', models);
+                        console.log('Accuracy Values:', accuracyValues);
+                        
+                        // Create colors array - highlight Random Forest in gold
+                        const colors = models.map(model => 
+                            model === 'Random Forest' ? '#FFD700' : '#636EFA'
+                        );
+                        
+                        const trace = {
+                            x: models,
+                            y: accuracyValues,
+                            type: 'bar',
+                            marker: {
+                                color: colors,
+                                line: {
+                                    color: models.map(model => 
+                                        model === 'Random Forest' ? '#FFA500' : '#636EFA'
+                                    ),
+                                    width: 2
+                                }
+                            },
+                            text: accuracyValues.map(v => v.toFixed(4)),
+                            textposition: 'outside',
+                            textfont: { 
+                                size: 12,
+                                color: 'black'
+                            },
+                            showlegend: false
+                        };
+                        
+                        const layout = {
+                            title: {
+                                text: 'Efficiency Optimization',
+                                font: { 
+                                    size: 18,
+                                    color: '#2c3e50',
+                                    family: 'Arial, sans-serif'
+                                },
+                                x: 0.5,
+                                xanchor: 'center'
+                            },
+                            xaxis: { 
+                                title: {
+                                    text: 'Models',
+                                    font: { size: 14 }
+                                },
+                                tickfont: { size: 11 },
+                                tickangle: -45,
+                                automargin: true,
+                                tickmode: 'array',
+                                tickvals: models,
+                                ticktext: models,
+                                type: 'category'
+                            },
+                            yaxis: { 
+                                title: {
+                                    text: 'Accuracy',
+                                    font: { size: 14 }
+                                },
+                                range: [0, 1.05],
+                                tickfont: { size: 12 },
+                                tickformat: '.2f'
+                            },
+                            height: 500,
+                            showlegend: false,
+                            plot_bgcolor: 'rgba(248, 249, 250, 0.8)',
+                            paper_bgcolor: 'white',
+                            margin: {
+                                l: 80,
+                                r: 150,
+                                t: 100,
+                                b: 150
+                            }
+                        };
+                        
+                        Plotly.newPlot('accuracyChart', [trace], layout, {responsive: true});
+                    }
+                })
+                .catch(error => {
+                    // Loading complete - chart appears instantly
+                    console.error('Error:', error);
+                });
+        }
+        
+        function loadHistoricalData(country) {
+            document.getElementById('historicalSection').style.display = 'block';
+            document.getElementById('historicalCountryName').textContent = `Efficiency optimization trends for ${country}`;
+            document.getElementById('historicalLoading').style.display = 'block';
+            document.getElementById('historicalChart').innerHTML = '';
+            fetch(`/api/objective6/historical/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    
+                    if (data.success && data.data.length > 0) {
+                        const years = data.data.map(d => d.Year);
+                        const accessPercentages = data.data.map(d => d.Access_Percentage);
+                        const accessLevels = data.data.map(d => d.Access_Level);
+                        
+                        const trace = {
+                            x: years,
+                            y: accessPercentages,
+                            type: 'scatter',
+                            mode: 'lines+markers',
+                            name: country,
+                            line: { width: 3, color: '#2E86AB' },
+                            marker: { size: 8, color: '#A23B72' },
+                            hovertemplate: `<b>${country}</b><br>Year: %{x}<br>Access: %{y:.1f}%<br>Level: %{text}<extra></extra>`,
+                            text: accessLevels
+                        };
+                        
+                        const layout = {
+                            title: `Historical Efficiency Optimization - ${country}`,
+                            xaxis: { 
+                                title: 'Year',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)'
+                            },
+                            yaxis: { 
+                                title: 'Efficiency Score (%)',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)',
+                                range: [0, 105]
+                            },
+                            height: 600,
+                            showlegend: false,
+                            plot_bgcolor: 'rgba(240, 245, 250, 0.5)',
+                            paper_bgcolor: 'white'
+                        };
+                        
+                        Plotly.newPlot('historicalChart', [trace], layout, {responsive: true});
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('historicalLoading').style.display = 'none';
+                    console.error('Error:', error);
+                });
+        }
+        
+        function loadCombinedData(country) {
+            document.getElementById('combinedSection').style.display = 'block';
+            document.getElementById('combinedCountryName').textContent = `Combined historical and predicted efficiency optimization for ${country}`;
+            document.getElementById('combinedLoading').style.display = 'block';
+            document.getElementById('combinedChart').innerHTML = '';
+            fetch(`/api/objective6/combined/?country=${encodeURIComponent(country)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('combinedLoading').style.display = 'none';
+                    
+                    if (data.success && data.data.length > 0) {
+                        // Separate historical and predicted data
+                        const historicalData = data.data.filter(d => d.type === 'historical');
+                        const predictedData = data.data.filter(d => d.type === 'predicted');
+                        
+                        const traces = [];
+                        
+                        // Historical trace (solid line)
+                        if (historicalData.length > 0) {
+                            traces.push({
+                                x: historicalData.map(d => d.year),
+                                y: historicalData.map(d => d.access_percentage),
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                name: `${country} (Historical)`,
+                                line: { width: 3, color: '#2E86AB' },
+                                marker: { size: 8, color: '#2E86AB' },
+                                hovertemplate: `<b>${country}</b><br>Year: %{x}<br>Access: %{y:.1f}%<br>Level: %{text}<extra></extra>`,
+                                text: historicalData.map(d => d.access_level)
+                            });
+                        }
+                        
+                        // Predicted trace (dashed line)
+                        if (predictedData.length > 0) {
+                            traces.push({
+                                x: predictedData.map(d => d.year),
+                                y: predictedData.map(d => d.access_percentage),
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                name: `${country} (Predicted)`,
+                                line: { width: 3, color: '#A23B72', dash: 'dash' },
+                                marker: { size: 8, color: '#A23B72' },
+                                hovertemplate: `<b>${country}</b><br>Year: %{x}<br>Access: %{y:.1f}%<br>Level: %{text}<extra></extra>`,
+                                text: predictedData.map(d => d.access_level)
+                            });
+                        }
+                        
+                        // Find the boundary year between historical and predicted
+                        const lastHistoricalYear = historicalData.length > 0 ? Math.max(...historicalData.map(d => d.year)) : 2020;
+                        
+                        const layout = {
+                            title: `Efficiency Optimization Analysis: ${country} (Historical + Future)`,
+                            xaxis: { 
+                                title: 'Year',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)'
+                            },
+                            yaxis: { 
+                                title: 'Efficiency Score (%)',
+                                showgrid: true,
+                                gridcolor: 'rgba(200,200,200,0.3)',
+                                range: [0, 105]
+                            },
+                            height: 600,
+                            showlegend: true,
+                            legend: { x: 0.02, y: 0.98 },
+                            plot_bgcolor: 'rgba(240, 245, 250, 0.5)',
+                            paper_bgcolor: 'white',
+                            shapes: [
+                                {
+                                    type: 'line',
+                                    x0: lastHistoricalYear + 0.5,
+                                    x1: lastHistoricalYear + 0.5,
+                                    y0: 0,
+                                    y1: 105,
+                                    line: {
+                                        color: 'rgba(0,0,0,0.3)',
+                                        width: 2,
+                                        dash: 'dash'
+                                    }
+                                }
+                            ],
+                            annotations: [
+                                {
+                                    x: lastHistoricalYear + 0.5,
+                                    y: 95,
+                                    text: 'Historical | Predicted',
+                                    showarrow: false,
+                                    font: { size: 12, color: 'rgba(0,0,0,0.6)' },
+                                    bgcolor: 'rgba(255,255,255,0.8)',
+                                    bordercolor: 'rgba(0,0,0,0.3)',
+                                    borderwidth: 1
+                                }
+                            ]
+                        };
+                        
+                        Plotly.newPlot('combinedChart', traces, layout, {responsive: true});
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('combinedLoading').style.display = 'none';
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Objective 4 APIs</title>
+    <script>
+        async function testAPIs() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Testing Objective 4 APIs...</h2>';
+            
+            // Test 1: Countries
+            try {
+                const resp1 = await fetch('http://127.0.0.1:8001/api/objective3/countries/');
+                const data1 = await resp1.json();
+                results.innerHTML += `<p>✓ Countries API: ${data1.success ? 'SUCCESS' : 'FAILED'} - ${data1.countries ? data1.countries.length : 0} countries</p>`;
+            } catch (e) {
+                results.innerHTML += `<p>✗ Countries API Error: ${e.message}</p>`;
+            }
+            
+            // Test 2: Model Comparison
+            try {
+                results.innerHTML += '<p>⏳ Loading model comparison (this takes 3-5 seconds)...</p>';
+                const resp2 = await fetch('http://127.0.0.1:8001/api/objective3/model-comparison/');
+                const data2 = await resp2.json();
+                results.innerHTML += `<p>✓ Model Comparison API: ${data2.success ? 'SUCCESS' : 'FAILED'} - Best: ${data2.best_model}</p>`;
+                results.innerHTML += `<pre>${JSON.stringify(data2.mse_scores, null, 2)}</pre>`;
+            } catch (e) {
+                results.innerHTML += `<p>✗ Model Comparison API Error: ${e.message}</p>`;
+            }
+            
+            // Test 3: Historical Data
+            try {
+                const resp3 = await fetch('http://127.0.0.1:8001/api/objective3/historical/?country=India');
+                const data3 = await resp3.json();
+                results.innerHTML += `<p>✓ Historical API: ${data3.success ? 'SUCCESS' : 'FAILED'} - ${data3.data ? data3.data.length : 0} records</p>`;
+            } catch (e) {
+                results.innerHTML += `<p>✗ Historical API Error: ${e.message}</p>`;
+            }
+            
+            results.innerHTML += '<h3>All tests complete!</h3>';
+        }
+    </script>
+</head>
+<body onload="testAPIs()">
+    <h1>Objective 4 API Test</h1>
+    <div id="results">Loading...</div>
+</body>
+</html>
